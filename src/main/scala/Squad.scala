@@ -1,5 +1,7 @@
 import scala.util.Random
 
+object EmptySquad extends Squad("", 0, 0,0,0,0,0,0, null)
+
 class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxHealth: Int, private val minAttack: Int, private val maxAttack: Int,
             val attack: Int, val defence: Int, val speed : Int, val army: Army) {
 
@@ -48,6 +50,8 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
     new SquadAttackResult(damage, false, killedCreatures, currentCreaturesNumber)
   }
 
+  def totalHealth() =  maxHealth * (currentCreaturesNumber - 1) + currentHealth
 
-  private def wouldSquadBeDeadAfterDamage(damage: Int): Boolean = maxHealth * (currentCreaturesNumber - 1) + currentHealth <= damage
+
+  private def wouldSquadBeDeadAfterDamage(damage: Int): Boolean = totalHealth() <= damage
 }
