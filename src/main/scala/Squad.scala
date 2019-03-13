@@ -23,6 +23,8 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
 
   def isAlive(): Boolean = currentCreaturesNumber > 0
 
+  def areSquadsFromTheSameArmy(other: Squad) = army != other.army
+
   override def toString: String = name
 
 

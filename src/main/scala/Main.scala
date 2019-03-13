@@ -16,11 +16,16 @@ object Main extends App {
     )
     stronghold.squads = strongholdArmy
 
-    val result = new Process(castle, stronghold).battle()
-    result match {
-      case BattleResult.FIRST_WIN => println(s"$castle win")
-      case BattleResult.SECOND_WIN => println(s"$stronghold win")
-    }
+    println("test place")
+    val process = new Process(castle, stronghold)
+    println(process.getTextualField())
+
+
+//    val result = new Process(castle, stronghold).battle()
+//    result match {
+//      case BattleResult.FIRST_WIN => println(s"$castle win")
+//      case BattleResult.SECOND_WIN => println(s"$stronghold win")
+//    }
 
   }
 
