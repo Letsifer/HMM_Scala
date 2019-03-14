@@ -2,8 +2,12 @@ trait ObjectOnField {
   def nameOnField(): String
 }
 
-object EmptyField extends ObjectOnField { //TODO change nulls to empty field
+object EmptyField extends ObjectOnField {
   override def nameOnField(): String = " "
+}
+
+object MountainOnField extends ObjectOnField {
+  override def nameOnField(): String = "*"
 }
 
 class SquadOnField(val squad: Squad) extends ObjectOnField {
