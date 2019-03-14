@@ -192,12 +192,23 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
   }
 
   private val attackModifierCoeficient = 0.05
-
+  private val scale = 2
+  /**
+    * Расчет коэффициента атаки.
+    *
+    * Если защита защищающегося больше атаки атакующего, то идет округление вниз до двух знаков после запятой.
+    *
+    * @param attacker
+    * @param attackerHero
+    * @param defender
+    * @param defenderHero
+    * @return
+    */
   private def calculateAttackModifier(attacker: Squad, attackerHero: Hero, defender: Squad, defenderHero: Hero): Double = {
     val attack = attacker.attack + attackerHero.attack
     val defence = defender.defence + defenderHero.defense
     if (attack >= defence) 1 + (attack - defence) * attackModifierCoeficient
-    else 1 / (1 + (defence - attack) * attackModifierCoeficient)
+    else BigDecimal(1 / (1 + (defence - attack) * attackModifierCoeficient)).setScale(scale, BigDecimal.RoundingMode.HALF_DOWN).toDouble
   }
 
   private def chooseNextAttacker(): Squad = {
