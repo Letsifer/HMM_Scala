@@ -2,6 +2,10 @@ trait ObjectOnField {
   def nameOnField(): String
 }
 
+object EmptyField extends ObjectOnField { //TODO change nulls to empty field
+  override def nameOnField(): String = " "
+}
+
 class SquadOnField(val squad: Squad) extends ObjectOnField {
   override def nameOnField() = if (squad.isAlive()) squad.toString.take(1) else " "
 
