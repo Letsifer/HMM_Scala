@@ -5,11 +5,11 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
   private val field = new Field
   placeSquadsOnField()
 
-  def getTextualField(): String = field.getTextualField()
+  override def toString: String = field.toString
 
   def battle(): BattleResult.BattleResult = {
     println("__________At start___________")
-    println(getTextualField())
+    println(this)
     while (firstArmy.isAlive() && secondArmy.isAlive()) {
       val attacker = queue.getNextSquad()
       println(s"Ходят $attacker")
@@ -38,7 +38,7 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
           }
         }
       }
-      println(getTextualField())
+      println(this)
     }
     throw new RuntimeException("Incorrect place in battle method")
   }

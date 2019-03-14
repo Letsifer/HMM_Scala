@@ -17,5 +17,7 @@ class SquadOnField(val squad: Squad) extends ObjectOnField {
 
   def isThisSquadOnField(squad: Squad) = squad == this.squad
 
+  def isOtherSquadOnField(squad: Squad) = !isThisSquadOnField(squad)
+
   def areSquadsFromTheSameArmy(other: Squad) = squad.areSquadsFromTheSameArmy(other)
 }

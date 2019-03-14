@@ -9,7 +9,7 @@ class Field {
   private val field = Array.ofDim[ObjectOnField](fieldHeight, fieldWidth)
   initField()
 
-  def getTextualField(): String = {
+  override def toString: String = {
     val fieldBuilder = StringBuilder.newBuilder
     for (line <- field) {
       fieldBuilder.append("|")
@@ -18,7 +18,7 @@ class Field {
       }
       fieldBuilder.append("\n")
     }
-    fieldBuilder.toString()
+    fieldBuilder.toString
   }
 
   def placeSquadOnField(squad: Squad, squadIndexInArmy: Int, squadsInArmy: Int, isAttackerSquad: Boolean) = {
@@ -92,11 +92,9 @@ class Field {
     if (passedSteps >= passedFields(point._1)(point._2) || passedSteps > fieldHeight + fieldWidth) return undefinedPoint
     passedFields(point._1)(point._2) = passedSteps
     field(point._1)(point._2) match {
-      case squadOnField: SquadOnField =>
-        if (!squadOnField.isThisSquadOnField(attacker)) {
-          if (squadOnField.areSquadsFromTheSameArmy(attacker) || squadOnField.isNotAlive()) return undefinedPoint
-          else return (passedSteps, path(attacker.speed)._1, path(attacker.speed)._2)
-        }
+      case squadOnField: SquadOnField if (squadOnField.isOtherSquadOnField(attacker)) =>
+        if (squadOnField.areSquadsFromTheSameArmy(attacker) || squadOnField.isNotAlive()) return undefinedPoint
+        else return (passedSteps, path(attacker.speed)._1, path(attacker.speed)._2)
       case MountainOnField => return undefinedPoint
       case _ =>
     }
@@ -124,10 +122,8 @@ class Field {
     if (passedSteps > attacker.speed + 1 || passedSteps >= passedFields(point._1)(point._2)) return List()
     passedFields(point._1)(point._2) = passedSteps
     field(point._1)(point._2) match {
-      case squadOnField: SquadOnField =>
-        if (!squadOnField.isThisSquadOnField(attacker)) {
-          if (squadOnField.areSquadsFromTheSameArmy(attacker) || squadOnField.isNotAlive()) return List() else return List(new AttackerPossibleGoal(previousPoint, squadOnField.squad))
-        }
+      case squadOnField: SquadOnField if (squadOnField.isOtherSquadOnField(attacker)) =>
+        return if (squadOnField.areSquadsFromTheSameArmy(attacker) || squadOnField.isNotAlive()) List() else List(new AttackerPossibleGoal(previousPoint, squadOnField.squad))
       case MountainOnField => return List()
       case _ =>
     }
@@ -142,7 +138,7 @@ class Field {
     for (i <- 0 until fieldHeight) {
       for (j <- 0 until fieldWidth) {
         field(i)(j) match {
-          case squadOnField: SquadOnField => if (squadOnField.isThisSquadOnField(squ)) return (i, j)
+          case squadOnField: SquadOnField if (squadOnField.isThisSquadOnField(squ)) => return (i, j)
           case _ =>
         }
       }
