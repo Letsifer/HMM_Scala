@@ -8,11 +8,11 @@ object Main extends App {
       new Squad("Рыцари", 9, 35, 6, 9, 10, 12, 5, castle)
     )
     castle.squads = castleSquads
-    val stronghold = new Army("Твердыня",      new Hero("Гретчин", 4, 0))
+    val stronghold = new Army("Твердыня", new Hero("Гретчин", 4, 0))
     val strongholdArmy = List(
       new Squad("Хогбгоблины", 80, 5, 1, 2, 5, 3, 7, stronghold),
       new Squad("Наездники на волках", 10, 10, 2, 4, 7, 5, 6, stronghold),
-      new Squad("Огры", 6, 40, 6, 12, 13, 7, 4, stronghold)
+      new Squad("Огры", 9, 40, 6, 12, 13, 7, 4, stronghold)
     )
     stronghold.squads = strongholdArmy
     val result = new Process(castle, stronghold).battle()
@@ -20,7 +20,13 @@ object Main extends App {
       case BattleResult.FIRST_WIN => println(s"$castle win")
       case BattleResult.SECOND_WIN => println(s"$stronghold win")
     }
-
+    println("--------------------------------------------------")
+    println(s"Статистика отрядов $castle")
+    println(s"${castle.getBattleResult()}")
+    println("--------------------------------------------------")
+    println(s"Статистика отрядов $stronghold")
+    println(s"${stronghold.getBattleResult()}")
+    println("--------------------------------------------------")
   }
 
 

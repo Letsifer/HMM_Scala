@@ -1,9 +1,7 @@
-import scala.collection.mutable.Queue
-
 
 class Process(private val firstArmy: Army, private val secondArmy: Army) {
 
-  private var queue = new Queue[Squad]
+  private val queue = new SquadQueue(firstArmy, secondArmy)
   private val field = new Field
   placeSquadsOnField()
 
@@ -13,42 +11,34 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
     println("__________At start___________")
     println(getTextualField())
     while (firstArmy.isAlive() && secondArmy.isAlive()) {
-      println("------Следующий ход------")
-      queue ++= firstArmy.squads
-      queue ++= secondArmy.squads
-      queue = queue.sortWith(_.speed > _.speed)
-      while (queue.nonEmpty) {
-        val attacker = chooseNextAttacker()
-        if (attacker != EmptySquad) {
-          println(s"Ходят $attacker")
-          val enemySquadsInRadius = field.findAllEnemySquadsInRadius(attacker)
-          if (enemySquadsInRadius.isEmpty) {
-            //отряд не может дойти ни до одного вражеского отряда за этот ход
-            field.move(attacker, field.findClosestEnemySquad(attacker))
-          } else {
-            //если findAllEnemySquadsInRadius вернет пустой список (учесть потом, атакующий отряд может как-то дойти до этой точки)
-            // то поиск ближайшего вражеского отряда и смещение туда
-            // иначе выбор цели атаки, смещение на соседнюю свободную клетку и атака
-            val attackerArmy = attacker.army
-            val defenderArmy = if (attackerArmy == firstArmy) secondArmy else firstArmy
-            field.move(attacker, enemySquadsInRadius.head.point)
-            val defender = enemySquadsInRadius.head.defender
-            val attackResult = attacker.attack(defender, calculateAttackModifier(attacker, attackerArmy.hero, defender, defenderArmy.hero))
-            if (attackResult.killedCreatures > 0) {
-              println(s"${attacker.name} нанесли ${attackResult.resultDamage} урона, убито ${attackResult.killedCreatures} ${defender.name}")
-            } else {
-              println(s"${attacker.name} нанесли ${attackResult.resultDamage} урона ${defender.name}")
-            }
-            if (attackResult.wereAllCreaturesInDefenderSquadKilled) {
-              if (defenderArmy.isNotAlive()) {
-                if (attackerArmy == firstArmy) return BattleResult.FIRST_WIN
-                else return BattleResult.SECOND_WIN
-              }
-            }
+      val attacker = queue.getNextSquad()
+      println(s"Ходят $attacker")
+      val enemySquadsInRadius = field.findAllEnemySquadsInRadius(attacker)
+      if (enemySquadsInRadius.isEmpty) {
+        //отряд не может дойти ни до одного вражеского отряда за этот ход
+        field.move(attacker, field.findClosestEnemySquad(attacker))
+      } else {
+        //если findAllEnemySquadsInRadius вернет пустой список
+        // то поиск ближайшего вражеского отряда и смещение туда
+        // иначе выбор цели атаки, смещение на соседнюю свободную клетку и атака
+        field.move(attacker, enemySquadsInRadius.head.point)
+        val defender = enemySquadsInRadius.head.defender
+        val attackerArmy = attacker.army
+        val defenderArmy = if (attackerArmy == firstArmy) secondArmy else firstArmy
+        val attackResult = attacker.attack(defender, calculateAttackModifier(attacker, attackerArmy.hero, defender, defenderArmy.hero))
+        if (attackResult.areCreaturesKilled()) {
+          println(s"${attacker.name} нанесли ${attackResult.resultDamage} урона, убито ${attackResult.killedCreatures} ${defender.name}")
+        } else {
+          println(s"${attacker.name} нанесли ${attackResult.resultDamage} урона ${defender.name}")
+        }
+        if (attackResult.wereAllCreaturesInDefenderSquadKilled) {
+          println(s"Все $defender были убиты")
+          if (defenderArmy.isNotAlive()) {
+            return if (attackerArmy == firstArmy) BattleResult.FIRST_WIN else BattleResult.SECOND_WIN
           }
         }
-        println(getTextualField())
       }
+      println(getTextualField())
     }
     throw new RuntimeException("Incorrect place in battle method")
   }
@@ -56,6 +46,7 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
 
   private val attackModifierCoeficient = 0.05
   private val scale = 2
+
   /**
     * Расчет коэффициента атаки.
     *
@@ -72,16 +63,6 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
     val defence = defender.defence + defenderHero.defense
     if (attack >= defence) 1 + (attack - defence) * attackModifierCoeficient
     else BigDecimal(1 / (1 + (defence - attack) * attackModifierCoeficient)).setScale(scale, BigDecimal.RoundingMode.HALF_DOWN).toDouble
-  }
-
-  private def chooseNextAttacker(): Squad = {
-    while (queue.nonEmpty) {
-      val attacker = queue.dequeue
-      if (attacker.isAlive()) {
-        return attacker
-      }
-    }
-    EmptySquad
   }
 
   private def placeSquadsOnField() = {

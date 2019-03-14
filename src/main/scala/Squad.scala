@@ -1,7 +1,5 @@
 import scala.util.Random
 
-object EmptySquad extends Squad("", 0, 0,0,0,0,0,0, null)
-
 class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxHealth: Int, private val minAttack: Int, private val maxAttack: Int,
             val attack: Int, val defence: Int, val speed : Int, val army: Army) {
 
@@ -26,7 +24,6 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
   def areSquadsFromTheSameArmy(other: Squad) = army == other.army
 
   override def toString: String = name
-
 
   private def countAttack(): Int = {
     val randomize = new Random()
@@ -53,7 +50,6 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
   }
 
   def totalHealth() =  maxHealth * (currentCreaturesNumber - 1) + currentHealth
-
 
   private def wouldSquadBeDeadAfterDamage(damage: Int): Boolean = totalHealth() <= damage
 }
