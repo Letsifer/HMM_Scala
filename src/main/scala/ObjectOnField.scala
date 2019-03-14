@@ -3,7 +3,9 @@ trait ObjectOnField {
 }
 
 class SquadOnField(val squad: Squad) extends ObjectOnField {
-  override def nameOnField() = squad.toString.take(1)
+  override def nameOnField() = if (squad.isAlive()) squad.toString.take(1) else " "
+
+  def isNotAlive() = !squad.isAlive()
 
   def isThisSquadOnField(squad: Squad) = squad == this.squad
 

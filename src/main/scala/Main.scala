@@ -5,7 +5,7 @@ object Main extends App {
     val castleSquads = List(
       new Squad("Копейщики", 20, 10, 1, 3, 4, 5, 4, castle),
       new Squad("Грифоны", 8, 25, 3, 6, 8, 8, 6, castle),
-      new Squad("Рыцари", 7, 35, 6, 9, 10, 12, 5, castle)
+      new Squad("Рыцари", 12, 35, 6, 9, 10, 12, 5, castle)
     )
     castle.squads = castleSquads
     val stronghold = new Army("Твердыня",      new Hero("Гретчин", 4, 0))
@@ -15,17 +15,11 @@ object Main extends App {
       new Squad("Огры", 6, 40, 6, 12, 13, 7, 4, stronghold)
     )
     stronghold.squads = strongholdArmy
-
-    println("test place")
-    val process = new Process(castle, stronghold)
-    println(process.getTextualField())
-
-
-//    val result = new Process(castle, stronghold).battle()
-//    result match {
-//      case BattleResult.FIRST_WIN => println(s"$castle win")
-//      case BattleResult.SECOND_WIN => println(s"$stronghold win")
-//    }
+    val result = new Process(castle, stronghold).battle()
+    result match {
+      case BattleResult.FIRST_WIN => println(s"$castle win")
+      case BattleResult.SECOND_WIN => println(s"$stronghold win")
+    }
 
   }
 

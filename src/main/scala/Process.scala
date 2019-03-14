@@ -24,6 +24,8 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
   }
 
   def battle(): BattleResult.BattleResult = {
+    println("__________At start___________")
+    println(getTextualField())
     while (firstArmy.isAlive() && secondArmy.isAlive()) {
       println("------Следующий ход------")
       queue ++= firstArmy.squads
@@ -35,7 +37,7 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
           println(s"Ходят $attacker")
           val enemySquadsInRadius = findAllEnemySquadsInRadius(attacker)
           if (enemySquadsInRadius.isEmpty) {
-            //отряд может не дойти ни до одного вражеского отряда
+            //отряд не может дойти ни до одного вражеского отряда за этот ход
             move(attacker, findClosestEnemySquad(attacker))
           } else {
             //если findAllEnemySquadsInRadius вернет пустой список (учесть потом, атакующий отряд может как-то дойти до этой точки)
@@ -59,6 +61,7 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
             }
           }
         }
+        println(getTextualField())
       }
     }
     throw new RuntimeException("Incorrect place in battle method")
@@ -68,9 +71,9 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
     val attackerCoordinates = findAttackerOnField(attacker)
     if (!attackerCoordinates.equals(newPoint)) {
       //TODO println movement
-      val attackerOnField = field(attackerCoordinates)
-      field(attackerCoordinates) = null
-      field(newPoint) = attackerOnField
+      val attackerOnField = field(attackerCoordinates._1)(attackerCoordinates._2)
+      field(attackerCoordinates._1)(attackerCoordinates._2) = null
+      field(newPoint._1)(newPoint._2) = attackerOnField
     }
   }
 
@@ -88,13 +91,11 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
       }
     }
     val fieldBetweenCurrentAndEnemy = findClosestEnemySquadFromPoint(attacker, attackerCoordinates, 0, passedFields, List())
-    return if (fieldBetweenCurrentAndEnemy._1 == undefinedPoint._1) attackerCoordinates else (fieldBetweenCurrentAndEnemy._1, fieldBetweenCurrentAndEnemy._2)
+    return if (fieldBetweenCurrentAndEnemy._1 == undefinedPoint._1) attackerCoordinates else (fieldBetweenCurrentAndEnemy._2, fieldBetweenCurrentAndEnemy._3)
   }
 
   /**
     * Поиск ближайших вражеских отрядов из этой точки
-    *
-    * TODO возвращается координата врага, а не координата, с которой его можно атаковать
     *
     * @param attacker
     * @param point
@@ -108,22 +109,22 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
                                             ): (Int, Int, Int) = {
     if (point._1 < 0 || point._1 >= fieldWidth) return undefinedPoint
     if (point._2 < 0 || point._2 >= fieldHeight) return undefinedPoint
-    if (passedSteps >= passedFields(point._1)(point._2)) return undefinedPoint
+    if (passedSteps >= passedFields(point._1)(point._2) || passedSteps > fieldHeight + fieldWidth) return undefinedPoint
     passedFields(point._1)(point._2) = passedSteps
     if (field(point._1)(point._2) != null) {
       field(point._1)(point._2) match {
         case squadOnField: SquadOnField =>
           if (!squadOnField.isThisSquadOnField(attacker)) {
-            if (squadOnField.areSquadsFromTheSameArmy(attacker)) return undefinedPoint
+            if (squadOnField.areSquadsFromTheSameArmy(attacker) || squadOnField.isNotAlive()) return undefinedPoint
             else return (passedSteps, path(attacker.speed)._1, path(attacker.speed)._2)
           }
       }
     }
-    val newPath = List(path) :+ point
-    val collectedEnemies = List(findClosestEnemySquadFromPoint(attacker, (point._1 + 1, point._2), passedSteps + 1, passedFields, newPath))
-    collectedEnemies :+ findClosestEnemySquadFromPoint(attacker, (point._1 - 1, point._2), passedSteps + 1, passedFields, newPath)
-    collectedEnemies :+ findClosestEnemySquadFromPoint(attacker, (point._1, point._2 + 1), passedSteps + 1, passedFields, newPath)
-    collectedEnemies :+ findClosestEnemySquadFromPoint(attacker, (point._1, point._2 - 1), passedSteps + 1, passedFields, newPath)
+    val newPath = path :+ point
+    var collectedEnemies = List(findClosestEnemySquadFromPoint(attacker, (point._1 + 1, point._2), passedSteps + 1, passedFields, newPath))
+    collectedEnemies = collectedEnemies :+ findClosestEnemySquadFromPoint(attacker, (point._1 - 1, point._2), passedSteps + 1, passedFields, newPath)
+    collectedEnemies = collectedEnemies :+ findClosestEnemySquadFromPoint(attacker, (point._1, point._2 + 1), passedSteps + 1, passedFields, newPath)
+    collectedEnemies = collectedEnemies :+ findClosestEnemySquadFromPoint(attacker, (point._1, point._2 - 1), passedSteps + 1, passedFields, newPath)
     val fieldBetweenCurrentAndEnemy = collectedEnemies.sortWith(_._1 < _._1).head
     return if (fieldBetweenCurrentAndEnemy._1 == undefinedPoint._1) undefinedPoint else fieldBetweenCurrentAndEnemy
   }
@@ -136,25 +137,20 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
     * Вражеский отряд может быть на расстоянии (скорость + 1), то есть атакующий подошел на максимальный радиус и ударил этот отряд.
     * Атаковать отряд может по вертикали или горизонтали относительно себя
     *
-    * TODO Possible Bug - через точку, которая первой попала в метод, расстояние может быть больше, чем через другую.
-    * Например атакующий стоит в точке (5,5), в точках (6, 5) и (6, 4) стоят союзники, а в точке (5,7) - враг.
-    * ДФС пойдет через точку (5,4) и найдет врага на расстоянии 6, а можно было пройти через точку (5,6), тогда расстояние будет 3.
-    *
     * @param attacker
     * @return
     */
   private def findAllEnemySquadsInRadius(attacker: Squad): List[AttackerPossibleGoal] = {
-    val passedFields = Array.ofDim[Boolean](fieldWidth, fieldHeight)
+    val passedFields = Array.ofDim[Int](fieldWidth, fieldHeight)
     for (i <- 0 until fieldWidth) {
       for (j <- 0 until fieldHeight) {
-        passedFields(i)(j) = false
+        passedFields(i)(j) = undefinedPoint._1
       }
     }
-    findAllEnemySquadsFromPoint(attacker, findAttackerOnField(attacker), 0, passedFields)
+    findAllEnemySquadsFromPoint(attacker, findAttackerOnField(attacker), null, 0, passedFields)
   }
 
   /**
-    * TODO Не совсем то возвращается - возвращается координата врага, а нужно координата, с которой атака идет, т.е. предыдущая точка
     *
     * @param attacker
     * @param point
@@ -162,32 +158,33 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
     * @param passedFields
     * @return
     */
-  private def findAllEnemySquadsFromPoint(attacker: Squad, point: (Int, Int), passedSteps: Int, passedFields: Array[Array[Boolean]]): List[AttackerPossibleGoal] = {
+  private def findAllEnemySquadsFromPoint(attacker: Squad, point: (Int, Int), previousPoint: (Int, Int), passedSteps: Int, passedFields: Array[Array[Int]]): List[AttackerPossibleGoal] = {
     if (point._1 < 0 || point._1 >= fieldWidth) return List()
     if (point._2 < 0 || point._2 >= fieldHeight) return List()
-    if (passedSteps > attacker.speed) return List()
-    if (passedFields(point._1)(point._2)) return List()
-    passedFields(point._1)(point._2) = true
+    if (passedSteps > attacker.speed + 1 || passedSteps >= passedFields(point._1)(point._2)) return List()
+    passedFields(point._1)(point._2) = passedSteps
     if (field(point._1)(point._2) != null) {
       field(point._1)(point._2) match {
         case squadOnField: SquadOnField =>
           if (!squadOnField.isThisSquadOnField(attacker)) {
-            if (squadOnField.areSquadsFromTheSameArmy(attacker)) return List() else return List(new AttackerPossibleGoal(point, squadOnField.squad))
+            if (squadOnField.areSquadsFromTheSameArmy(attacker) || squadOnField.isNotAlive()) return List() else return List(new AttackerPossibleGoal(previousPoint, squadOnField.squad))
           }
       }
     }
-    val result = findAllEnemySquadsFromPoint(attacker, (point._1 + 1, point._2), passedSteps + 1, passedFields)
-    result ::: findAllEnemySquadsFromPoint(attacker, (point._1 - 1, point._2), passedSteps + 1, passedFields)
-    result ::: findAllEnemySquadsFromPoint(attacker, (point._1, point._2 + 1), passedSteps + 1, passedFields)
-    result ::: findAllEnemySquadsFromPoint(attacker, (point._1, point._2 - 1), passedSteps + 1, passedFields)
+    var result = findAllEnemySquadsFromPoint(attacker, (point._1 + 1, point._2), point, passedSteps + 1, passedFields)
+    result = result ::: findAllEnemySquadsFromPoint(attacker, (point._1 - 1, point._2), point, passedSteps + 1, passedFields)
+    result = result ::: findAllEnemySquadsFromPoint(attacker, (point._1, point._2 + 1), point, passedSteps + 1, passedFields)
+    result = result ::: findAllEnemySquadsFromPoint(attacker, (point._1, point._2 - 1), point, passedSteps + 1, passedFields)
     result
   }
 
   private def findAttackerOnField(attacker: Squad): (Int, Int) = {
     for (i <- 0 until fieldWidth) {
       for (j <- 0 until fieldHeight) {
-        field(i)(j) match {
-          case squadOnField: SquadOnField => if (squadOnField.isThisSquadOnField(attacker)) return (i, j)
+        if (field(i)(j) != null) {
+          field(i)(j) match {
+            case squadOnField: SquadOnField => if (squadOnField.isThisSquadOnField(attacker)) return (i, j)
+          }
         }
       }
     }
