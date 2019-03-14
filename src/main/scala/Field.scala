@@ -4,9 +4,9 @@ class AttackerPossibleGoal(val point: (Int, Int), val defender: Squad)
 
 class Field {
 
-  private val fieldWidth = 10
-  private val fieldHeight = 10
-  private val field = Array.ofDim[ObjectOnField](fieldWidth, fieldHeight)
+  private val fieldWidth = 15
+  private val fieldHeight = 11
+  private val field = Array.ofDim[ObjectOnField](fieldHeight, fieldWidth)
   initField()
 
   def getTextualField(): String = {
@@ -21,10 +21,10 @@ class Field {
     fieldBuilder.toString()
   }
 
-  def placeSquadOnField(squad: Squad, squadIndexInArmy: Int, isAttackerSquad: Boolean) = {
-    val x = if (isAttackerSquad) 0 else fieldWidth - 1
-    val y = squadIndexInArmy
-    field(y)(x) = new SquadOnField(squad)
+  def placeSquadOnField(squad: Squad, squadIndexInArmy: Int, squadsInArmy: Int, isAttackerSquad: Boolean) = {
+    val j = if (isAttackerSquad) 0 else fieldWidth - 1
+    val i = (fieldHeight.toDouble / (squadsInArmy + 1) * (squadIndexInArmy + 1)).toInt
+    field(i)(j) = new SquadOnField(squad)
   }
 
   def move(attacker: Squad, newPoint: (Int, Int)) = {
@@ -43,9 +43,9 @@ class Field {
 
   def findClosestEnemySquad(attacker: Squad): (Int, Int) = {
     val attackerCoordinates = findSquadOnField(attacker)
-    val passedFields = Array.ofDim[Int](fieldWidth, fieldHeight)
-    for (i <- 0 until fieldWidth) {
-      for (j <- 0 until fieldHeight) {
+    val passedFields = Array.ofDim[Int](fieldHeight, fieldWidth)
+    for (i <- 0 until fieldHeight) {
+      for (j <- 0 until fieldWidth) {
         passedFields(i)(j) = undefinedPoint._1
       }
     }
@@ -64,9 +64,9 @@ class Field {
     * @return
     */
   def findAllEnemySquadsInRadius(attacker: Squad): List[AttackerPossibleGoal] = {
-    val passedFields = Array.ofDim[Int](fieldWidth, fieldHeight)
-    for (i <- 0 until fieldWidth) {
-      for (j <- 0 until fieldHeight) {
+    val passedFields = Array.ofDim[Int](fieldHeight, fieldWidth)
+    for (i <- 0 until fieldHeight) {
+      for (j <- 0 until fieldWidth) {
         passedFields(i)(j) = undefinedPoint._1
       }
     }
@@ -87,8 +87,8 @@ class Field {
   private def findClosestEnemySquadFromPoint(
                                               attacker: Squad, point: (Int, Int), passedSteps: Int, passedFields: Array[Array[Int]], path: List[(Int, Int)]
                                             ): (Int, Int, Int) = {
-    if (point._1 < 0 || point._1 >= fieldWidth) return undefinedPoint
-    if (point._2 < 0 || point._2 >= fieldHeight) return undefinedPoint
+    if (point._1 < 0 || point._1 >= fieldHeight) return undefinedPoint
+    if (point._2 < 0 || point._2 >= fieldWidth) return undefinedPoint
     if (passedSteps >= passedFields(point._1)(point._2) || passedSteps > fieldHeight + fieldWidth) return undefinedPoint
     passedFields(point._1)(point._2) = passedSteps
     field(point._1)(point._2) match {
@@ -119,8 +119,8 @@ class Field {
     * @return
     */
   private def findAllEnemySquadsFromPoint(attacker: Squad, point: (Int, Int), previousPoint: (Int, Int), passedSteps: Int, passedFields: Array[Array[Int]]): List[AttackerPossibleGoal] = {
-    if (point._1 < 0 || point._1 >= fieldWidth) return List()
-    if (point._2 < 0 || point._2 >= fieldHeight) return List()
+    if (point._1 < 0 || point._1 >= fieldHeight) return List()
+    if (point._2 < 0 || point._2 >= fieldWidth) return List()
     if (passedSteps > attacker.speed + 1 || passedSteps >= passedFields(point._1)(point._2)) return List()
     passedFields(point._1)(point._2) = passedSteps
     field(point._1)(point._2) match {
@@ -139,8 +139,8 @@ class Field {
   }
 
   private def findSquadOnField(squ: Squad): (Int, Int) = {
-    for (i <- 0 until fieldWidth) {
-      for (j <- 0 until fieldHeight) {
+    for (i <- 0 until fieldHeight) {
+      for (j <- 0 until fieldWidth) {
         field(i)(j) match {
           case squadOnField: SquadOnField => if (squadOnField.isThisSquadOnField(squ)) return (i, j)
           case _ =>
@@ -151,8 +151,8 @@ class Field {
   }
 
   private def initField() = {
-    for (i <- 0 until fieldWidth) {
-      for (j <- 0 until fieldHeight) {
+    for (i <- 0 until fieldHeight) {
+      for (j <- 0 until fieldWidth) {
         field(i)(j) = EmptyField
       }
     }

@@ -67,10 +67,10 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
 
   private def placeSquadsOnField() = {
     for (i <- firstArmy.squads.indices) {
-      field.placeSquadOnField(firstArmy.squads(i), i, true)
+      field.placeSquadOnField(firstArmy.squads(i), i, firstArmy.squads.length, true)
     }
     for (i <- secondArmy.squads.indices) {
-      field.placeSquadOnField(secondArmy.squads(i), i, false)
+      field.placeSquadOnField(secondArmy.squads(i), i, firstArmy.squads.length, false)
     }
   }
 
