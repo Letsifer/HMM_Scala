@@ -1,10 +1,18 @@
 import scala.util.Random
 
+trait Attacker {
+  def getAttack : Int
+  def getDefense : Int
+}
+
 class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxHealth: Int, private val minAttack: Int, private val maxAttack: Int,
-            val attack: Int, val defence: Int, val speed : Int, val army: Army) {
+            private val attack: Int, private val defence: Int, val speed : Int, val army: Army) extends Attacker{
 
   private var currentCreaturesNumber = creaturesInSquadAtStart
   private var currentHealth = maxHealth
+
+  def getAttack : Int = attack
+  def getDefense : Int = defence
 
   /**
     * Атака защищающегося юнита
@@ -13,19 +21,19 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
     * @return Был ли убит защищающийся отряд
     */
   def attack(defender: Squad, attackModifier : Double): SquadAttackResult = {
-    val damage = (countAttack() * attackModifier).toInt
+    val damage = (countAttack * attackModifier).toInt
     defender.receiveDamage(damage)
   }
 
-  def getLostCreaturesNumberWhileBattle(): Int = creaturesInSquadAtStart - currentCreaturesNumber
+  def getLostCreaturesNumberWhileBattle = creaturesInSquadAtStart - currentCreaturesNumber
 
-  def isAlive(): Boolean = currentCreaturesNumber > 0
+  def isAlive = currentCreaturesNumber > 0
 
   def areSquadsFromTheSameArmy(other: Squad) = army == other.army
 
   override def toString: String = name
 
-  private def countAttack(): Int = {
+  private def countAttack = {
     val randomize = new Random()
     Range(0, currentCreaturesNumber).map(i => minAttack + randomize.nextInt(maxAttack - minAttack + 1)).sum
   }

@@ -4,16 +4,16 @@ class TestCoeficient extends FlatSpec with PrivateMethodTester {
 
   private def routineTesting(attackerHeroAttack: Int, attackerSquadAttack: Int, defenderHeroDefense: Int, defenderSquadDefense: Int, expectedResult: Double) = {
     val attackerHero = new Hero("attacker_hero", attackerHeroAttack, 0)
-    val attackerArmy = new Army("attacker_army", attackerHero)
-    val attacker = new Squad("attacker", 0, 0, 0, 0, attackerSquadAttack, 0, 0, attackerArmy)
-    attackerArmy.squads = List(attacker)
+    val attacker = new SquadBean("attacker", 0, 0, 0, 0, attackerSquadAttack, 0, 0)
+    val attackerArmy = new Army("attacker_army", attackerHero, List(attacker))
+
     val defenderHero = new Hero("defender_hero", 0, defenderHeroDefense)
-    val defenderArmy = new Army("defender_army", defenderHero)
-    val defender = new Squad("defender", 0, 0, 0, 0, 0, defenderSquadDefense, 0, defenderArmy)
-    defenderArmy.squads = List(defender)
+    val defender = new SquadBean("defender", 0, 0, 0, 0, 0, defenderSquadDefense, 0)
+    val defenderArmy = new Army("defender_army", defenderHero, List(defender))
+
     val process = new Process(attackerArmy, defenderArmy)
     val method = PrivateMethod[Double]('calculateAttackModifier)
-    val result = (process invokePrivate method(attacker, attackerHero, defender, defenderHero))
+    val result = process.invokePrivate(method(attacker, attackerHero, defender, defenderHero))
     assert(result === expectedResult)
   }
 

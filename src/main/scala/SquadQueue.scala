@@ -11,8 +11,8 @@ class SquadQueue(private val firstArmy: Army, private val secondArmy: Army) {
     */
   private def updateQueue() = {
     println("------Следующий ход------")
-    queue ++= firstArmy.squads.filter(_.isAlive())
-    queue ++= secondArmy.squads.filter(_.isAlive())
+    queue ++= firstArmy.squads.filter(_.isAlive)
+    queue ++= secondArmy.squads.filter(_.isAlive)
     queue = queue.sortWith(_.speed > _.speed)
   }
 
@@ -28,7 +28,7 @@ class SquadQueue(private val firstArmy: Army, private val secondArmy: Army) {
   def getNextSquad(): Squad = {
     while (queue.nonEmpty) {
       val attacker = queue.dequeue
-      if (attacker.isAlive()) {
+      if (attacker.isAlive) {
         return attacker
       }
     }

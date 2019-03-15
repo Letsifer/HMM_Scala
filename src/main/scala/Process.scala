@@ -7,10 +7,12 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
 
   override def toString: String = field.toString
 
+
+
   def battle(): BattleResult.BattleResult = {
     println("__________At start___________")
     println(this)
-    while (firstArmy.isAlive() && secondArmy.isAlive()) {
+    while (firstArmy.isAlive && secondArmy.isAlive) {
       val attacker = queue.getNextSquad()
       println(s"Ходят $attacker")
       val enemySquadsInRadius = field.findAllEnemySquadsInRadius(attacker)
@@ -33,7 +35,7 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
         }
         if (attackResult.wereAllCreaturesInDefenderSquadKilled) {
           println(s"Все $defender были убиты")
-          if (defenderArmy.isNotAlive()) {
+          if (defenderArmy.isNotAlive) {
             return if (attackerArmy == firstArmy) BattleResult.FIRST_WIN else BattleResult.SECOND_WIN
           }
         }
@@ -58,9 +60,9 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
     * @param defenderHero
     * @return
     */
-  private def calculateAttackModifier(attacker: Squad, attackerHero: Hero, defender: Squad, defenderHero: Hero): Double = {
-    val attack = attacker.attack + attackerHero.attack
-    val defence = defender.defence + defenderHero.defense
+  private def calculateAttackModifier(attacker: Attacker, attackerHero: Hero, defender: Attacker, defenderHero: Hero): Double = {
+    val attack = attacker.getAttack + attackerHero.attack
+    val defence = defender.getDefense + defenderHero.defense
     if (attack >= defence) 1 + (attack - defence) * attackModifierCoeficient
     else BigDecimal(1 / (1 + (defence - attack) * attackModifierCoeficient)).setScale(scale, BigDecimal.RoundingMode.HALF_DOWN).toDouble
   }

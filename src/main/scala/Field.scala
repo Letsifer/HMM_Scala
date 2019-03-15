@@ -14,7 +14,7 @@ class Field {
     for (line <- field) {
       fieldBuilder.append("|")
       for (objectOnField <- line) {
-        fieldBuilder.append(objectOnField.nameOnField()).append("|")
+        fieldBuilder.append(objectOnField.nameOnField).append("|")
       }
       fieldBuilder.append("\n")
     }
@@ -29,7 +29,7 @@ class Field {
 
   def move(attacker: Squad, newPoint: (Int, Int)) = {
     val attackerCoordinates = findSquadOnField(attacker)
-    if (!attackerCoordinates.equals(newPoint)) {
+    if (attackerCoordinates != newPoint) {
       val attackerOnField = field(attackerCoordinates._1)(attackerCoordinates._2)
       field(attackerCoordinates._1)(attackerCoordinates._2) = EmptyField
       field(newPoint._1)(newPoint._2) = attackerOnField
@@ -93,7 +93,7 @@ class Field {
     passedFields(point._1)(point._2) = passedSteps
     field(point._1)(point._2) match {
       case squadOnField: SquadOnField if (squadOnField.isOtherSquadOnField(attacker)) =>
-        if (squadOnField.areSquadsFromTheSameArmy(attacker) || squadOnField.isNotAlive()) return undefinedPoint
+        if (squadOnField.areSquadsFromTheSameArmy(attacker) || squadOnField.isNotAlive) return undefinedPoint
         else return (passedSteps, path(attacker.speed)._1, path(attacker.speed)._2)
       case MountainOnField => return undefinedPoint
       case _ =>
@@ -123,7 +123,7 @@ class Field {
     passedFields(point._1)(point._2) = passedSteps
     field(point._1)(point._2) match {
       case squadOnField: SquadOnField if (squadOnField.isOtherSquadOnField(attacker)) =>
-        return if (squadOnField.areSquadsFromTheSameArmy(attacker) || squadOnField.isNotAlive()) List() else List(new AttackerPossibleGoal(previousPoint, squadOnField.squad))
+        return if (squadOnField.areSquadsFromTheSameArmy(attacker) || squadOnField.isNotAlive) List() else List(new AttackerPossibleGoal(previousPoint, squadOnField.squad))
       case MountainOnField => return List()
       case _ =>
     }
