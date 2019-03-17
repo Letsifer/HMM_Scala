@@ -1,3 +1,7 @@
+package main
+
+import scala.{App, Array}
+
 object Main extends App {
 
   override def main(args: Array[String]) = {

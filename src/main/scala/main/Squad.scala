@@ -1,3 +1,8 @@
+package main
+
+import spell.{ContinuusSpell, DefenseSpell}
+
+import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
 trait Attacker {
@@ -8,11 +13,13 @@ trait Attacker {
 class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxHealth: Int, private val minAttack: Int, private val maxAttack: Int,
             private val attack: Int, private val defence: Int, val speed : Int, val army: Army) extends Attacker{
 
+  val spellsOnSquad : ListBuffer[ContinuusSpell]
+
   private var currentCreaturesNumber = creaturesInSquadAtStart
   private var currentHealth = maxHealth
 
   def getAttack : Int = attack
-  def getDefense : Int = defence
+  def getDefense : Int = defence + spellsOnSquad.filter(_.isInstanceOf[DefenseSpell]).map()
 
   /**
     * Атака защищающегося юнита

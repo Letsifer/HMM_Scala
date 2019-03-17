@@ -1,3 +1,5 @@
+package main
+
 
 class Process(private val firstArmy: Army, private val secondArmy: Army) {
 

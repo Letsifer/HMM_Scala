@@ -1,3 +1,5 @@
+package main
+
 import scala.util.Random
 
 class AttackerPossibleGoal(val point: (Int, Int), val defender: Squad)

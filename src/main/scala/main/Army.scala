@@ -1,3 +1,5 @@
+package main
+
 class Army(val name: String, val hero: Hero, private val beans : List[SquadBean]) {
 
   val squads: List[Squad] = beans.map(b => new Squad(b.name, b.creaturesInSquadAtStart, b.maxHealth, b.minAttack, b.maxAttack, b.attack, b.defence, b.speed, this))

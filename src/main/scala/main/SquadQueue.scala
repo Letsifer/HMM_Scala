@@ -1,3 +1,5 @@
+package main
+
 import scala.collection.mutable.Queue
 
 class SquadQueue(private val firstArmy: Army, private val secondArmy: Army) {
