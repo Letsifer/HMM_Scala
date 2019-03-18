@@ -1,4 +1,5 @@
-import main.{Army, Hero, Process, SquadBean}
+import hero.Hero
+import main.{Army, Process, SquadBean}
 import org.scalatest.{FlatSpec, PrivateMethodTester}
 
 class TestCoeficient extends FlatSpec with PrivateMethodTester {

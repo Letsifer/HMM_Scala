@@ -1,5 +1,7 @@
 package main
 
+import hero.Hero
+
 
 class Process(private val firstArmy: Army, private val secondArmy: Army) {
 
@@ -10,12 +12,13 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
   override def toString: String = field.toString
 
 
-
   def battle(): BattleResult.BattleResult = {
     println("__________At start___________")
     println(this)
     while (firstArmy.isAlive && secondArmy.isAlive) {
       val attacker = queue.getNextSquad()
+      val attackerArmy = attacker.army
+      val defenderArmy = if (attackerArmy == firstArmy) secondArmy else firstArmy
       println(s"Ходят $attacker")
       val enemySquadsInRadius = field.findAllEnemySquadsInRadius(attacker)
       if (enemySquadsInRadius.isEmpty) {
@@ -27,8 +30,6 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
         // иначе выбор цели атаки, смещение на соседнюю свободную клетку и атака
         field.move(attacker, enemySquadsInRadius.head.point)
         val defender = enemySquadsInRadius.head.defender
-        val attackerArmy = attacker.army
-        val defenderArmy = if (attackerArmy == firstArmy) secondArmy else firstArmy
         val attackResult = attacker.attack(defender, calculateAttackModifier(attacker, attackerArmy.hero, defender, defenderArmy.hero))
         if (attackResult.areCreaturesKilled()) {
           println(s"${attacker.name} нанесли ${attackResult.resultDamage} урона, убито ${attackResult.killedCreatures} ${defender.name}")
@@ -42,6 +43,7 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
           }
         }
       }
+      attackerArmy.hero.useSpellOnSquad(attackerArmy, defenderArmy)
       println(this)
     }
     throw new RuntimeException("Incorrect place in battle method")

@@ -1,25 +1,37 @@
 package main
 
-import spell.{ContinuusSpell, DefenseSpell}
+import hero.{ContinuusSpell, DefenseSpell, HeroSpell, Spell}
 
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
 trait Attacker {
-  def getAttack : Int
-  def getDefense : Int
+  def getAttack: Int
+
+  def getDefense: Int
 }
 
 class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxHealth: Int, private val minAttack: Int, private val maxAttack: Int,
-            private val attack: Int, private val defence: Int, val speed : Int, val army: Army) extends Attacker{
+            private val attack: Int, private val defence: Int, val speed: Int, val army: Army) extends Attacker {
 
-  val spellsOnSquad : ListBuffer[ContinuusSpell]
+  private val spellsOnSquad = new ListBuffer[ContinuusSpell]
 
   private var currentCreaturesNumber = creaturesInSquadAtStart
   private var currentHealth = maxHealth
 
-  def getAttack : Int = attack
-  def getDefense : Int = defence + spellsOnSquad.filter(_.isInstanceOf[DefenseSpell]).map()
+  def getAttack: Int = attack
+
+  def getDefense: Int = defence + spellsOnSquad.collect{
+    case defenseSpell: DefenseSpell => defenseSpell.changeDefenseValue
+    case _ => 0
+  }.sum
+
+  def recieveSpell(spell: Spell) = {
+    spell match {
+      case continuusSpell: ContinuusSpell => spellsOnSquad += continuusSpell
+        //если моментальный - то recieveDamage...
+    }
+  }
 
   /**
     * Атака защищающегося юнита
@@ -27,7 +39,7 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
     * @param defender Защищающийся отряд
     * @return Был ли убит защищающийся отряд
     */
-  def attack(defender: Squad, attackModifier : Double): SquadAttackResult = {
+  def attack(defender: Squad, attackModifier: Double): SquadAttackResult = {
     val damage = (countAttack * attackModifier).toInt
     defender.receiveDamage(damage)
   }
@@ -64,7 +76,7 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
     new SquadAttackResult(damage, false, killedCreatures, currentCreaturesNumber)
   }
 
-  def totalHealth() =  maxHealth * (currentCreaturesNumber - 1) + currentHealth
+  def totalHealth() = maxHealth * (currentCreaturesNumber - 1) + currentHealth
 
   private def wouldSquadBeDeadAfterDamage(damage: Int): Boolean = totalHealth() <= damage
 }
