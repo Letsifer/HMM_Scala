@@ -9,16 +9,16 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
   private val field = new Field
   placeSquadsOnField()
 
-  override def toString: String = field.toString
-
+  override def toString: String = (s"${field}\n${firstArmy.getFullInfo}\n${secondArmy.getFullInfo}")
 
   def battle(): BattleResult.BattleResult = {
     println("__________At start___________")
-    println(this)
     while (firstArmy.isAlive && secondArmy.isAlive) {
-      val attacker = queue.getNextSquad()
+      println(this)
+      val attacker = queue.nextSquad
       val attackerArmy = attacker.army
       val defenderArmy = if (attackerArmy == firstArmy) secondArmy else firstArmy
+      attackerArmy.hero.useSpellOnSquad(attackerArmy, defenderArmy)
       println(s"Ходят $attacker")
       val enemySquadsInRadius = field.findAllEnemySquadsInRadius(attacker)
       if (enemySquadsInRadius.isEmpty) {
@@ -43,8 +43,6 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
           }
         }
       }
-      attackerArmy.hero.useSpellOnSquad(attackerArmy, defenderArmy)
-      println(this)
     }
     throw new RuntimeException("Incorrect place in battle method")
   }

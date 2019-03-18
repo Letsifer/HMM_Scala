@@ -29,7 +29,7 @@ class SquadQueue(private val firstArmy: Army, private val secondArmy: Army) {
     *
     * @return
     */
-  def getNextSquad(): Squad = {
+  def nextSquad: Squad = {
     while (queue.nonEmpty) {
       val attacker = queue.dequeue
       if (attacker.isAlive) {

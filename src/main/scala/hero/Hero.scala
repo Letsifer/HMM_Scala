@@ -29,13 +29,13 @@ class Hero(val name: String, val attack: Int, val defense: Int, val army: Army) 
     val chosenSpell = spellBook.chooseSpell
     val randomAllySquad = allyArmy.getRandomAliveSquad
     if (chosenSpell.canBeActedOnSquad(randomAllySquad, this)) {
-      randomAllySquad.recieveSpell(chosenSpell.squadSpellByHeroSpell)
+      randomAllySquad.receiveSpell(chosenSpell.squadSpellByHeroSpell(randomAllySquad))
       println(s"$name использует заклинание $chosenSpell на $randomAllySquad")
       canUseSpell = false
     } else {
       val randomEnemySquad = enemyArmy.getRandomAliveSquad
       if (chosenSpell.canBeActedOnSquad(randomEnemySquad, this)) {
-        randomEnemySquad.recieveSpell(chosenSpell.squadSpellByHeroSpell)
+        randomEnemySquad.receiveSpell(chosenSpell.squadSpellByHeroSpell(randomAllySquad))
         println(s"$name использует заклинание $chosenSpell на $randomEnemySquad")
         canUseSpell = false
       }

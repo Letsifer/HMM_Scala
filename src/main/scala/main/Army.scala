@@ -9,7 +9,6 @@ class Army(val name: String, private val heroBean: HeroBean, private val beans :
   val hero = new Hero(heroBean.name, heroBean.attack, heroBean.defense, this)
   val squads: List[Squad] = beans.map(b => new Squad(b.name, b.creaturesInSquadAtStart, b.maxHealth, b.minAttack, b.maxAttack, b.attack, b.defence, b.speed, this))
 
-
   override def toString: String = name
 
   def isAlive = squads.exists(_.isAlive)
@@ -19,10 +18,15 @@ class Army(val name: String, private val heroBean: HeroBean, private val beans :
     squads.map(squad => s"$squad: Было ${squad.creaturesInSquadAtStart}, потеряно ${squad.getLostCreaturesNumberWhileBattle}").mkString("\n")
   }
 
-
   def getRandomAliveSquad() : Squad = {
     val random = new Random()
     val aliveSquads = squads.filter(_.isAlive)
     aliveSquads(random.nextInt(aliveSquads.size))
+  }
+
+  def getFullInfo: String = {
+    val squadBuilder = StringBuilder.newBuilder
+    squads.filter(_.isAlive).map(_.getFullInfo).foreach(squadBuilder.append(_).append("\n"))
+    squadBuilder.toString
   }
 }

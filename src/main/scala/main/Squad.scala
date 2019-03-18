@@ -21,16 +21,20 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
 
   def getAttack: Int = attack
 
-  def getDefense: Int = defence + spellsOnSquad.collect{
+  def getDefense: Int = defence + spellsOnSquad.collect {
     case defenseSpell: DefenseSpell => defenseSpell.changeDefenseValue
     case _ => 0
   }.sum
 
-  def recieveSpell(spell: Spell) = {
+  def receiveSpell(spell: Spell) = {
     spell match {
       case continuusSpell: ContinuusSpell => spellsOnSquad += continuusSpell
-        //если моментальный - то recieveDamage...
+      //если моментальный - то recieveDamage...
     }
+  }
+
+  def removeSpell(spell: ContinuusSpell): Unit = {
+    spellsOnSquad -= spell
   }
 
   /**
@@ -51,6 +55,16 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
   def areSquadsFromTheSameArmy(other: Squad) = army == other.army
 
   override def toString: String = name
+
+  def getFullInfo: String = {
+    val squadBuilder = StringBuilder.newBuilder
+    squadBuilder.append(s"$name: HP=$currentHealth($maxHealth), количество=$currentCreaturesNumber (было $creaturesInSquadAtStart)\n")
+    squadBuilder.append(s"Атака=$getAttack, защита=$getDefense, урон=($minAttack-$maxAttack), скорость=$speed\n")
+    for (spell <- spellsOnSquad) {
+      squadBuilder.append(s"$spell\n")
+    }
+    squadBuilder.toString
+  }
 
   private def countAttack = {
     val randomize = new Random()
