@@ -7,7 +7,7 @@ import scala.util.Random
 class HeroBean(val name: String, val attack: Int, val defense: Int)
 
 class HeroSpellBook {
-  private val heroSpells = List(StoneSpellHeroSpell, DestructionSpellHeroSpell)
+  private val heroSpells = List(StoneSkinHeroSpell, DestructionHeroSpell, WeaknessHeroSpell, BloodLustHeroSpell)
 
   def chooseSpell: HeroSpell = {
     val rand = new Random()

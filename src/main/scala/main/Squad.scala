@@ -1,6 +1,6 @@
 package main
 
-import hero.{ContinuusSpell, DefenseSpell, HeroSpell, Spell}
+import hero.{ContinuusSpell, DefenseSpell, AttackSpell, Spell}
 
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
@@ -19,7 +19,10 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
   private var currentCreaturesNumber = creaturesInSquadAtStart
   private var currentHealth = maxHealth
 
-  def getAttack: Int = attack
+  def getAttack: Int = attack + spellsOnSquad.collect {
+    case attackSpell: AttackSpell => attackSpell.changeAttackValue
+    case _ => 0
+  }.sum
 
   def getDefense: Int = defence + spellsOnSquad.collect {
     case defenseSpell: DefenseSpell => defenseSpell.changeDefenseValue
@@ -68,7 +71,7 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
 
   private def countAttack = {
     val randomize = new Random()
-    Range(0, currentCreaturesNumber).map(i => minAttack + randomize.nextInt(maxAttack - minAttack + 1)).sum
+    currentCreaturesNumber * (minAttack + randomize.nextInt(maxAttack - minAttack + 1))
   }
 
   private def receiveDamage(damage: Int): SquadAttackResult = {
@@ -84,7 +87,7 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
       currentHealth -= remainDamage
     } else {
       killedCreatures += 1
-      currentHealth = maxHealth - (currentHealth - remainDamage)
+      currentHealth = maxHealth - (remainDamage - currentHealth)
     }
     currentCreaturesNumber -= killedCreatures
     new SquadAttackResult(damage, false, killedCreatures, currentCreaturesNumber)
