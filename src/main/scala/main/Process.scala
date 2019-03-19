@@ -19,6 +19,9 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
       val attackerArmy = attacker.army
       val defenderArmy = if (attackerArmy == firstArmy) secondArmy else firstArmy
       attackerArmy.hero.useSpellOnSquad(attackerArmy, defenderArmy)
+      if (defenderArmy.isNotAlive) {
+        return if (attackerArmy == firstArmy) BattleResult.FIRST_WIN else BattleResult.SECOND_WIN
+      }
       println(s"Ходят $attacker")
       val enemySquadsInRadius = field.findAllEnemySquadsInRadius(attacker)
       if (enemySquadsInRadius.isEmpty) {

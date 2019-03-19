@@ -1,6 +1,6 @@
 package main
 
-import hero.{ContinuusSpell, DefenseSpell, AttackSpell, Spell}
+import hero._
 
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
@@ -31,8 +31,13 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
 
   def receiveSpell(spell: Spell) = {
     spell match {
-      case continuusSpell: ContinuusSpell => spellsOnSquad += continuusSpell
-      //если моментальный - то recieveDamage...
+      case continuusSpell: ContinuusSpell => {
+        spellsOnSquad += continuusSpell
+        new SquadAttackResult(0, false, 0, currentCreaturesNumber)
+      }
+      case straightDamageSpell: StraightDamageSpell => {
+        receiveDamage(straightDamageSpell.damage)
+      }
     }
   }
 

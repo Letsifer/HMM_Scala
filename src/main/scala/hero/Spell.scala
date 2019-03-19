@@ -26,6 +26,12 @@ object BloodLustHeroSpell extends AllySpell {
   override def toString: String = "Жажда крови"
 }
 
+//object HealingHeroSpell extends AllySpell {
+//  override def squadSpellByHeroSpell(goal: Squad): Spell = new HealingSpell()
+//
+//  override def toString: String = "Лечение"
+//}
+
 abstract class EnemySpell extends HeroSpell {
   override def canBeActedOnSquad(goal: Squad, hero: Hero): Boolean = goal.army != hero.army
 }
@@ -42,8 +48,26 @@ object WeaknessHeroSpell extends EnemySpell {
   override def toString: String = "Слабость"
 }
 
+object MagicMissleHeroSpell extends EnemySpell {
+  override def squadSpellByHeroSpell(goal: Squad): Spell = new MagicMissleSpell()
+
+  override def toString: String = "Волшебная стрела"
+}
+
 
 trait Spell {
+}
+
+abstract class StraightDamageSpell(private val name: String) extends Spell{
+  def damage : Int
+}
+
+//class HealingSpell(private val name = "Лечение") extends Spell {
+//  def healing = 20
+//}
+
+class MagicMissleSpell extends StraightDamageSpell("Волшебная стрела") {
+  override def damage: Int = 30
 }
 
 abstract class ContinuusSpell(private val name: String, private val roundsToBe: Int, private val goal : Squad) extends Spell {

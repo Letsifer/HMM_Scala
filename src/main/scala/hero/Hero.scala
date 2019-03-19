@@ -7,7 +7,7 @@ import scala.util.Random
 class HeroBean(val name: String, val attack: Int, val defense: Int)
 
 class HeroSpellBook {
-  private val heroSpells = List(StoneSkinHeroSpell, DestructionHeroSpell, WeaknessHeroSpell, BloodLustHeroSpell)
+  private val heroSpells = List(StoneSkinHeroSpell, DestructionHeroSpell, WeaknessHeroSpell, BloodLustHeroSpell, MagicMissleHeroSpell)
 
   def chooseSpell: HeroSpell = {
     val rand = new Random()
@@ -35,8 +35,15 @@ class Hero(val name: String, val attack: Int, val defense: Int, val army: Army) 
     } else {
       val randomEnemySquad = enemyArmy.getRandomAliveSquad
       if (chosenSpell.canBeActedOnSquad(randomEnemySquad, this)) {
-        randomEnemySquad.receiveSpell(chosenSpell.squadSpellByHeroSpell(randomAllySquad))
+        val attackResult = randomEnemySquad.receiveSpell(chosenSpell.squadSpellByHeroSpell(randomAllySquad))
         println(s"$name использует заклинание $chosenSpell на $randomEnemySquad")
+        if (attackResult.resultDamage > 0) {
+          if (attackResult.areCreaturesKilled()) {
+            println(s"$randomEnemySquad получили ${attackResult.resultDamage} урона, убито ${attackResult.killedCreatures} $randomEnemySquad")
+          } else {
+            println(s"$randomEnemySquad получили ${attackResult.resultDamage} урона")
+          }
+        }
         canUseSpell = false
       }
     }
