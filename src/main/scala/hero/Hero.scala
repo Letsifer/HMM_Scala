@@ -7,7 +7,7 @@ import scala.util.Random
 class HeroBean(val name: String, val attack: Int, val defense: Int)
 
 class HeroSpellBook {
-  private val heroSpells = List(StoneSkinHeroSpell, DestructionHeroSpell, WeaknessHeroSpell, BloodLustHeroSpell, MagicMissleHeroSpell)
+  private val heroSpells = List(StoneSkinHeroSpell, DestructionHeroSpell, WeaknessHeroSpell, BloodLustHeroSpell, MagicMissileHeroSpell, HealingHeroSpell)
 
   def chooseSpell: HeroSpell = {
     val rand = new Random()
@@ -22,6 +22,8 @@ class Hero(val name: String, val attack: Int, val defense: Int, val army: Army) 
 
   def updateSpellUsage = canUseSpell = true
 
+  override def toString: String = name
+
   def useSpellOnSquad(allyArmy: Army, enemyArmy: Army) : Unit = {
     if (!canUseSpell) {
       return
@@ -29,21 +31,12 @@ class Hero(val name: String, val attack: Int, val defense: Int, val army: Army) 
     val chosenSpell = spellBook.chooseSpell
     val randomAllySquad = allyArmy.getRandomAliveSquad
     if (chosenSpell.canBeActedOnSquad(randomAllySquad, this)) {
-      randomAllySquad.receiveSpell(chosenSpell.squadSpellByHeroSpell(randomAllySquad))
-      println(s"$name использует заклинание $chosenSpell на $randomAllySquad")
+      println(randomAllySquad.receiveSpell(chosenSpell.squadSpellByHeroSpell(randomAllySquad), this))
       canUseSpell = false
     } else {
       val randomEnemySquad = enemyArmy.getRandomAliveSquad
       if (chosenSpell.canBeActedOnSquad(randomEnemySquad, this)) {
-        val attackResult = randomEnemySquad.receiveSpell(chosenSpell.squadSpellByHeroSpell(randomAllySquad))
-        println(s"$name использует заклинание $chosenSpell на $randomEnemySquad")
-        if (attackResult.resultDamage > 0) {
-          if (attackResult.areCreaturesKilled()) {
-            println(s"$randomEnemySquad получили ${attackResult.resultDamage} урона, убито ${attackResult.killedCreatures} $randomEnemySquad")
-          } else {
-            println(s"$randomEnemySquad получили ${attackResult.resultDamage} урона")
-          }
-        }
+        println(randomEnemySquad.receiveSpell(chosenSpell.squadSpellByHeroSpell(randomAllySquad), this))
         canUseSpell = false
       }
     }

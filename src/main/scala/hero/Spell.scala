@@ -26,11 +26,11 @@ object BloodLustHeroSpell extends AllySpell {
   override def toString: String = "Жажда крови"
 }
 
-//object HealingHeroSpell extends AllySpell {
-//  override def squadSpellByHeroSpell(goal: Squad): Spell = new HealingSpell()
-//
-//  override def toString: String = "Лечение"
-//}
+object HealingHeroSpell extends AllySpell {
+  override def squadSpellByHeroSpell(goal: Squad): Spell = new HealingSpell()
+
+  override def toString: String = "Лечение"
+}
 
 abstract class EnemySpell extends HeroSpell {
   override def canBeActedOnSquad(goal: Squad, hero: Hero): Boolean = goal.army != hero.army
@@ -48,8 +48,8 @@ object WeaknessHeroSpell extends EnemySpell {
   override def toString: String = "Слабость"
 }
 
-object MagicMissleHeroSpell extends EnemySpell {
-  override def squadSpellByHeroSpell(goal: Squad): Spell = new MagicMissleSpell()
+object MagicMissileHeroSpell extends EnemySpell {
+  override def squadSpellByHeroSpell(goal: Squad): Spell = new MagicMissileSpell()
 
   override def toString: String = "Волшебная стрела"
 }
@@ -58,19 +58,23 @@ object MagicMissleHeroSpell extends EnemySpell {
 trait Spell {
 }
 
-abstract class StraightDamageSpell(private val name: String) extends Spell{
-  def damage : Int
+abstract class StraightDamageSpell(private val name: String) extends Spell {
+  def damage: Int
+
+  override def toString: String = name
 }
 
-//class HealingSpell(private val name = "Лечение") extends Spell {
-//  def healing = 20
-//}
+class HealingSpell(private val name: String = "Лечение") extends Spell {
+  def healing = 20
 
-class MagicMissleSpell extends StraightDamageSpell("Волшебная стрела") {
+  override def toString: String = name
+}
+
+class MagicMissileSpell extends StraightDamageSpell("Волшебная стрела") {
   override def damage: Int = 30
 }
 
-abstract class ContinuusSpell(private val name: String, private val roundsToBe: Int, private val goal : Squad) extends Spell {
+abstract class ContinuousSpell(private val name: String, private val roundsToBe: Int, private val goal: Squad) extends Spell {
   private var remainRounds = roundsToBe
 
   def decreaseSteps() = {
@@ -87,33 +91,33 @@ abstract class ContinuusSpell(private val name: String, private val roundsToBe: 
   override def toString: String = name
 }
 
-abstract class Buff(private val name: String, private val roundsToBe: Int, private val goal : Squad) extends ContinuusSpell(name, roundsToBe, goal) {
+abstract class Buff(private val name: String, private val roundsToBe: Int, private val goal: Squad) extends ContinuousSpell(name, roundsToBe, goal) {
 }
 
-abstract class Debuff(private val name: String, private val roundsToBe: Int, private val goal : Squad) extends ContinuusSpell(name, roundsToBe, goal) {
+abstract class Debuff(private val name: String, private val roundsToBe: Int, private val goal: Squad) extends ContinuousSpell(name, roundsToBe, goal) {
 }
 
-trait AttackSpell {
+trait AttackSpell extends Spell {
   def changeAttackValue: Int
 }
 
 //Заклинания на изменение защиты отряда
-trait DefenseSpell {
+trait DefenseSpell extends Spell {
   def changeDefenseValue: Int
 }
 
-class StoneSkinSkill(private val goal : Squad) extends Buff("Каменная кожа", 3, goal) with DefenseSpell {
+class StoneSkinSkill(private val goal: Squad) extends Buff("Каменная кожа", 3, goal) with DefenseSpell {
   override def changeDefenseValue: Int = 3
 }
 
-class DestructionSpell(private val goal : Squad) extends Debuff("Разрушение брони", 3, goal) with DefenseSpell {
+class DestructionSpell(private val goal: Squad) extends Debuff("Разрушение брони", 3, goal) with DefenseSpell {
   override def changeDefenseValue: Int = -3
 }
 
-class BloodLustSpell(private val goal : Squad) extends Buff("Жажда крови", 3, goal) with AttackSpell {
+class BloodLustSpell(private val goal: Squad) extends Buff("Жажда крови", 3, goal) with AttackSpell {
   override def changeAttackValue: Int = 3
 }
 
-class WeaknessSpell(private val goal : Squad) extends Buff("Слабость", 3, goal) with AttackSpell {
+class WeaknessSpell(private val goal: Squad) extends Buff("Слабость", 3, goal) with AttackSpell {
   override def changeAttackValue: Int = -3
 }

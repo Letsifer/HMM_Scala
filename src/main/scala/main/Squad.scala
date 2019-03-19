@@ -14,7 +14,7 @@ trait Attacker {
 class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxHealth: Int, private val minAttack: Int, private val maxAttack: Int,
             private val attack: Int, private val defence: Int, val speed: Int, val army: Army) extends Attacker {
 
-  private val spellsOnSquad = new ListBuffer[ContinuusSpell]
+  private val spellsOnSquad = new ListBuffer[ContinuousSpell]
 
   private var currentCreaturesNumber = creaturesInSquadAtStart
   private var currentHealth = maxHealth
@@ -29,19 +29,30 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
     case _ => 0
   }.sum
 
-  def receiveSpell(spell: Spell) = {
+  def receiveSpell(spell: Spell, wizard: Hero) = {
     spell match {
-      case continuusSpell: ContinuusSpell => {
-        spellsOnSquad += continuusSpell
-        new SquadAttackResult(0, false, 0, currentCreaturesNumber)
+      case continuousSpell: ContinuousSpell => {
+        spellsOnSquad += continuousSpell
+        new HeroSpellResult(wizard, spell, this)
       }
       case straightDamageSpell: StraightDamageSpell => {
-        receiveDamage(straightDamageSpell.damage)
+        val result = receiveDamage(straightDamageSpell.damage)
+        new DamageSpellResult(wizard, spell, this, result.resultDamage, result.wereAllCreaturesInDefenderSquadKilled, result.killedCreatures)
+      }
+      case healingSpell: HealingSpell => {
+        if (maxHealth - currentHealth >= healingSpell.healing) {
+          currentHealth += healingSpell.healing
+          new HealingSpellResult(wizard, spell, this, healingSpell.healing)
+        } else {
+          val healed = maxHealth - currentHealth
+          currentHealth = maxHealth
+          new HealingSpellResult(wizard, spell, this, healed)
+        }
       }
     }
   }
 
-  def removeSpell(spell: ContinuusSpell): Unit = {
+  def removeSpell(spell: ContinuousSpell): Unit = {
     spellsOnSquad -= spell
   }
 
@@ -84,7 +95,7 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
       val killedCreatures = currentCreaturesNumber
       currentCreaturesNumber = 0
       currentHealth = 0
-      return new SquadAttackResult(damage, true, killedCreatures, currentCreaturesNumber)
+      return new SquadAttackResult(damage, true, killedCreatures)
     }
     var killedCreatures = damage / maxHealth
     val remainDamage = damage - killedCreatures * maxHealth
@@ -95,7 +106,7 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
       currentHealth = maxHealth - (remainDamage - currentHealth)
     }
     currentCreaturesNumber -= killedCreatures
-    new SquadAttackResult(damage, false, killedCreatures, currentCreaturesNumber)
+    new SquadAttackResult(damage, false, killedCreatures)
   }
 
   def totalHealth() = maxHealth * (currentCreaturesNumber - 1) + currentHealth
