@@ -1,16 +1,16 @@
 import hero.Hero
-import main.{Army, Process, SquadBean}
+import main.{Army, Process, Squad}
 import org.scalatest.{FlatSpec, PrivateMethodTester}
 
 class TestCoeficient extends FlatSpec with PrivateMethodTester {
 
   private def routineTesting(attackerHeroAttack: Int, attackerSquadAttack: Int, defenderHeroDefense: Int, defenderSquadDefense: Int, expectedResult: Double) = {
     val attackerHero = new Hero("attacker_hero", attackerHeroAttack, 0)
-    val attacker = new SquadBean("attacker", 0, 0, 0, 0, attackerSquadAttack, 0, 0)
+    val attacker = new Squad("attacker", 0, 0, 0, 0, attackerSquadAttack, 0, 0)
     val attackerArmy = new Army("attacker_army", attackerHero, List(attacker))
 
     val defenderHero = new Hero("defender_hero", 0, defenderHeroDefense)
-    val defender = new SquadBean("defender", 0, 0, 0, 0, 0, defenderSquadDefense, 0)
+    val defender = new Squad("defender", 0, 0, 0, 0, 0, defenderSquadDefense, 0)
     val defenderArmy = new Army("defender_army", defenderHero, List(defender))
 
     val process = new Process(attackerArmy, defenderArmy)

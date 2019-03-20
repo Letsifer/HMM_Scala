@@ -2,7 +2,7 @@ package main
 
 import scala.util.Random
 
-class AttackerPossibleGoal(val point: (Int, Int), val defender: Squad)
+class AttackerPossibleGoal(val point: (Int, Int), val defender: SquadInArmy)
 
 class Field {
 
@@ -23,13 +23,13 @@ class Field {
     fieldBuilder.toString
   }
 
-  def placeSquadOnField(squad: Squad, squadIndexInArmy: Int, squadsInArmy: Int, isAttackerSquad: Boolean) = {
+  def placeSquadOnField(squadInArmy: SquadInArmy, squadIndexInArmy: Int, squadsInArmy: Int, isAttackerSquad: Boolean) = {
     val j = if (isAttackerSquad) 0 else fieldWidth - 1
     val i = (fieldHeight.toDouble / (squadsInArmy + 1) * (squadIndexInArmy + 1)).toInt
-    field(i)(j) = new SquadOnField(squad)
+    field(i)(j) = new SquadOnField(squadInArmy)
   }
 
-  def move(attacker: Squad, newPoint: (Int, Int)) = {
+  def move(attacker: SquadInArmy, newPoint: (Int, Int)) = {
     val attackerCoordinates = findSquadOnField(attacker)
     if (attackerCoordinates != newPoint) {
       val attackerOnField = field(attackerCoordinates._1)(attackerCoordinates._2)
@@ -43,7 +43,7 @@ class Field {
     */
   private val undefinedPoint = (1000 * 1000, -1, -1)
 
-  def findClosestEnemySquad(attacker: Squad): (Int, Int) = {
+  def findClosestEnemySquad(attacker: SquadInArmy): (Int, Int) = {
     val attackerCoordinates = findSquadOnField(attacker)
     val passedFields = Array.ofDim[Int](fieldHeight, fieldWidth)
     for (i <- 0 until fieldHeight) {
@@ -65,7 +65,7 @@ class Field {
     * @param attacker
     * @return
     */
-  def findAllEnemySquadsInRadius(attacker: Squad): List[AttackerPossibleGoal] = {
+  def findAllEnemySquadsInRadius(attacker: SquadInArmy): List[AttackerPossibleGoal] = {
     val passedFields = Array.ofDim[Int](fieldHeight, fieldWidth)
     for (i <- 0 until fieldHeight) {
       for (j <- 0 until fieldWidth) {
@@ -87,7 +87,7 @@ class Field {
     *         чтобы добраться до этого врага
     */
   private def findClosestEnemySquadFromPoint(
-                                              attacker: Squad, point: (Int, Int), passedSteps: Int, passedFields: Array[Array[Int]], path: List[(Int, Int)]
+                                              attacker: SquadInArmy, point: (Int, Int), passedSteps: Int, passedFields: Array[Array[Int]], path: List[(Int, Int)]
                                             ): (Int, Int, Int) = {
     if (point._1 < 0 || point._1 >= fieldHeight) return undefinedPoint
     if (point._2 < 0 || point._2 >= fieldWidth) return undefinedPoint
@@ -96,7 +96,7 @@ class Field {
     field(point._1)(point._2) match {
       case squadOnField: SquadOnField if (squadOnField.isOtherSquadOnField(attacker)) =>
         if (squadOnField.areSquadsFromTheSameArmy(attacker) || squadOnField.isNotAlive) return undefinedPoint
-        else return (passedSteps, path(attacker.speed)._1, path(attacker.speed)._2)
+        else return (passedSteps, path(attacker.getSpeed)._1, path(attacker.getSpeed)._2)
       case MountainOnField => return undefinedPoint
       case _ =>
     }
@@ -118,14 +118,14 @@ class Field {
     * @param passedFields
     * @return
     */
-  private def findAllEnemySquadsFromPoint(attacker: Squad, point: (Int, Int), previousPoint: (Int, Int), passedSteps: Int, passedFields: Array[Array[Int]]): List[AttackerPossibleGoal] = {
+  private def findAllEnemySquadsFromPoint(attacker: SquadInArmy, point: (Int, Int), previousPoint: (Int, Int), passedSteps: Int, passedFields: Array[Array[Int]]): List[AttackerPossibleGoal] = {
     if (point._1 < 0 || point._1 >= fieldHeight) return List()
     if (point._2 < 0 || point._2 >= fieldWidth) return List()
-    if (passedSteps > attacker.speed + 1 || passedSteps >= passedFields(point._1)(point._2)) return List()
+    if (passedSteps > attacker.getSpeed + 1 || passedSteps >= passedFields(point._1)(point._2)) return List()
     passedFields(point._1)(point._2) = passedSteps
     field(point._1)(point._2) match {
       case squadOnField: SquadOnField if (squadOnField.isOtherSquadOnField(attacker)) =>
-        return if (squadOnField.areSquadsFromTheSameArmy(attacker) || squadOnField.isNotAlive) List() else List(new AttackerPossibleGoal(previousPoint, squadOnField.squad))
+        return if (squadOnField.areSquadsFromTheSameArmy(attacker) || squadOnField.isNotAlive) List() else List(new AttackerPossibleGoal(previousPoint, squadOnField.squadInArmy))
       case MountainOnField => return List()
       case _ =>
     }
@@ -136,16 +136,16 @@ class Field {
     result
   }
 
-  private def findSquadOnField(squ: Squad): (Int, Int) = {
+  private def findSquadOnField(squadInArmy: SquadInArmy): (Int, Int) = {
     for (i <- 0 until fieldHeight) {
       for (j <- 0 until fieldWidth) {
         field(i)(j) match {
-          case squadOnField: SquadOnField if (squadOnField.isThisSquadOnField(squ)) => return (i, j)
+          case squadOnField: SquadOnField if (squadOnField.isThisSquadOnField(squadInArmy: SquadInArmy)) => return (i, j)
           case _ =>
         }
       }
     }
-    throw new IllegalStateException(s"Cannot find attacker $squ on field")
+    throw new IllegalStateException(s"Cannot find attacker $squadInArmy: SquadInArmy on field")
   }
 
   private def initField() = {

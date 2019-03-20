@@ -4,7 +4,7 @@ import scala.collection.mutable.Queue
 
 class SquadQueue(private val firstArmy: Army, private val secondArmy: Army) {
 
-  private var queue = new Queue[Squad]
+  private var queue = new Queue[SquadInArmy]
 
   /**
     * Заполняет очередь существ на новый ход, заодно показывает начало следующего хода.
@@ -13,11 +13,11 @@ class SquadQueue(private val firstArmy: Army, private val secondArmy: Army) {
     */
   private def updateQueue() = {
     println("------Следующий ход------")
-    queue ++= firstArmy.squads.filter(_.isAlive)
-    queue ++= secondArmy.squads.filter(_.isAlive)
-    queue = queue.sortWith(_.speed > _.speed)
-    firstArmy.hero.updateSpellUsage
-    secondArmy.hero.updateSpellUsage
+    queue ++= firstArmy.squadsInArmy.filter(_.isAlive)
+    queue ++= secondArmy.squadsInArmy.filter(_.isAlive)
+    queue = queue.sortWith(_.getSpeed > _.getSpeed)
+    firstArmy.heroInArmy.updateSpellUsage
+    secondArmy.heroInArmy.updateSpellUsage
   }
 
   /**
@@ -29,7 +29,7 @@ class SquadQueue(private val firstArmy: Army, private val secondArmy: Army) {
     *
     * @return
     */
-  def nextSquad: Squad = {
+  def nextSquad: SquadInArmy = {
     while (queue.nonEmpty) {
       val attacker = queue.dequeue
       if (attacker.isAlive) {

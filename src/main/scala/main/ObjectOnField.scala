@@ -12,14 +12,14 @@ object MountainOnField extends ObjectOnField {
   override def nameOnField: String = "*"
 }
 
-class SquadOnField(val squad: Squad) extends ObjectOnField {
-  override def nameOnField = if (squad.isAlive) squad.toString.take(1) else " "
+class SquadOnField(val squadInArmy: SquadInArmy) extends ObjectOnField {
+  override def nameOnField = squadInArmy.getShortTitle
 
-  def isNotAlive = !squad.isAlive
+  def isNotAlive = !squadInArmy.isAlive
 
-  def isThisSquadOnField(squad: Squad) = squad == this.squad
+  def isThisSquadOnField(other: SquadInArmy) = squadInArmy == this.squadInArmy
 
-  def isOtherSquadOnField(squad: Squad) = !isThisSquadOnField(squad)
+  def isOtherSquadOnField(other: SquadInArmy) = !isThisSquadOnField(squadInArmy)
 
-  def areSquadsFromTheSameArmy(other: Squad) = squad.areSquadsFromTheSameArmy(other)
+  def areSquadsFromTheSameArmy(other: SquadInArmy) = squadInArmy.areSquadsFromTheSameArmy(other)
 }

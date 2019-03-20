@@ -1,9 +1,9 @@
 package hero
 
-import main.Squad
+import main.{Squad, SquadInArmy}
 
 trait HeroSpell {
-  def canBeActedOnSquad(goal: Squad, hero: Hero): Boolean
+  def canBeActedOnSquad(goal: SquadInArmy, hero: HeroInArmy): Boolean
 
   def squadSpellByHeroSpell(goal: Squad): Spell
 
@@ -11,7 +11,7 @@ trait HeroSpell {
 }
 
 abstract class AllySpell extends HeroSpell {
-  override def canBeActedOnSquad(goal: Squad, hero: Hero): Boolean = goal.army == hero.army
+  override def canBeActedOnSquad(goal: SquadInArmy, hero: HeroInArmy): Boolean = goal.army == hero.army
 }
 
 object StoneSkinHeroSpell extends AllySpell {
@@ -33,7 +33,7 @@ object HealingHeroSpell extends AllySpell {
 }
 
 abstract class EnemySpell extends HeroSpell {
-  override def canBeActedOnSquad(goal: Squad, hero: Hero): Boolean = goal.army != hero.army
+  override def canBeActedOnSquad(goal: SquadInArmy, hero: HeroInArmy): Boolean = goal.army != hero.army
 }
 
 object DestructionHeroSpell extends EnemySpell {

@@ -1,13 +1,13 @@
 package main
 
-import hero.{Hero, HeroBean}
+import hero.{Hero, HeroInArmy}
 
 import scala.util.Random
 
-class Army(val name: String, private val heroBean: HeroBean, private val beans : List[SquadBean]) {
+class Army(val name: String, private val hero: Hero, private val squads : List[Squad]) {
 
-  val hero = new Hero(heroBean.name, heroBean.attack, heroBean.defense, this)
-  val squads: List[Squad] = beans.map(b => new Squad(b.name, b.creaturesInSquadAtStart, b.maxHealth, b.minAttack, b.maxAttack, b.attack, b.defence, b.speed, this))
+  val heroInArmy = new HeroInArmy(hero, this)
+  val squadsInArmy: List[SquadInArmy] = squads.map(squad => new SquadInArmy(squad, this))
 
   override def toString: String = name
 
@@ -18,9 +18,9 @@ class Army(val name: String, private val heroBean: HeroBean, private val beans :
     squads.map(squad => s"$squad: Было ${squad.creaturesInSquadAtStart}, потеряно ${squad.getLostCreaturesNumberWhileBattle}").mkString("\n")
   }
 
-  def getRandomAliveSquad() : Squad = {
+  def getRandomAliveSquad() = {
     val random = new Random()
-    val aliveSquads = squads.filter(_.isAlive)
+    val aliveSquads = squadsInArmy.filter(_.isAlive)
     aliveSquads(random.nextInt(aliveSquads.size))
   }
 

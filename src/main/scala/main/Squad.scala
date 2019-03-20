@@ -5,14 +5,27 @@ import hero._
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
 
-trait Attacker {
-  def getAttack: Int
+class SquadInArmy(val squad: Squad, val army: Army) {
 
-  def getDefense: Int
+  def areSquadsFromTheSameArmy(other: SquadInArmy) = army == other.army
+
+  def isAlive = squad.isAlive
+
+  def getShortTitle = if (isAlive) squad.toString.take(1) else " "
+
+  def getSpeed = squad.speed
+
+  def receiveSpell(spell: Spell, wizard : Hero) = squad.receiveSpell(spell, wizard)
+
+  def attack(defender: SquadInArmy, attackModifier: Double) = squad.attack(defender.squad, attackModifier)
+
+  override def toString: String = squad.toString
+
+  def totalHealth() = squad.totalHealth()
 }
 
 class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxHealth: Int, private val minAttack: Int, private val maxAttack: Int,
-            private val attack: Int, private val defence: Int, val speed: Int, val army: Army) extends Attacker {
+            private val attack: Int, private val defence: Int, val speed: Int)  {
 
   private val spellsOnSquad = new ListBuffer[ContinuousSpell]
 
@@ -71,7 +84,6 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
 
   def isAlive = currentCreaturesNumber > 0
 
-  def areSquadsFromTheSameArmy(other: Squad) = army == other.army
 
   override def toString: String = name
 

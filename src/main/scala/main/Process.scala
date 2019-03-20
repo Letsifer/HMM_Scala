@@ -18,7 +18,7 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
       val attacker = queue.nextSquad
       val attackerArmy = attacker.army
       val defenderArmy = if (attackerArmy == firstArmy) secondArmy else firstArmy
-      attackerArmy.hero.useSpellOnSquad(attackerArmy, defenderArmy)
+      attackerArmy.heroInArmy.useSpellOnSquad(defenderArmy)
       if (defenderArmy.isNotAlive) {
         return if (attackerArmy == firstArmy) BattleResult.FIRST_WIN else BattleResult.SECOND_WIN
       }
@@ -33,11 +33,11 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
         // иначе выбор цели атаки, смещение на соседнюю свободную клетку и атака
         field.move(attacker, enemySquadsInRadius.head.point)
         val defender = enemySquadsInRadius.head.defender
-        val attackResult = attacker.attack(defender, calculateAttackModifier(attacker, attackerArmy.hero, defender, defenderArmy.hero))
+        val attackResult = attacker.attack(defender, calculateAttackModifier(attacker.squad, attackerArmy.heroInArmy.hero, defender.squad, defenderArmy.heroInArmy.hero))
         if (attackResult.areCreaturesKilled()) {
-          println(s"${attacker.name} нанесли ${attackResult.resultDamage} урона, убито ${attackResult.killedCreatures} ${defender.name}")
+          println(s"${attacker} нанесли ${attackResult.resultDamage} урона, убито ${attackResult.killedCreatures} ${defender}")
         } else {
-          println(s"${attacker.name} нанесли ${attackResult.resultDamage} урона ${defender.name}")
+          println(s"${attacker} нанесли ${attackResult.resultDamage} урона ${defender}")
         }
         if (attackResult.wereAllCreaturesInDefenderSquadKilled) {
           println(s"Все $defender были убиты")
@@ -65,7 +65,7 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
     * @param defenderHero
     * @return
     */
-  private def calculateAttackModifier(attacker: Attacker, attackerHero: Hero, defender: Attacker, defenderHero: Hero): Double = {
+  private def calculateAttackModifier(attacker: Squad, attackerHero: Hero, defender: Squad, defenderHero: Hero): Double = {
     val attack = attacker.getAttack + attackerHero.attack
     val defence = defender.getDefense + defenderHero.defense
     if (attack >= defence) 1 + (attack - defence) * attackModifierCoeficient
@@ -73,11 +73,11 @@ class Process(private val firstArmy: Army, private val secondArmy: Army) {
   }
 
   private def placeSquadsOnField() = {
-    for (i <- firstArmy.squads.indices) {
-      field.placeSquadOnField(firstArmy.squads(i), i, firstArmy.squads.length, true)
+    for (i <- firstArmy.squadsInArmy.indices) {
+      field.placeSquadOnField(firstArmy.squadsInArmy(i), i, firstArmy.squadsInArmy.length, true)
     }
-    for (i <- secondArmy.squads.indices) {
-      field.placeSquadOnField(secondArmy.squads(i), i, firstArmy.squads.length, false)
+    for (i <- secondArmy.squadsInArmy.indices) {
+      field.placeSquadOnField(secondArmy.squadsInArmy(i), i, firstArmy.squadsInArmy.length, false)
     }
   }
 
