@@ -15,7 +15,7 @@ object Main extends App {
       List(
         new Squad("Хогбгоблины", 80, 5, 1, 2, 5, 3, 7),
         new Squad("Наездники на волках", 10, 10, 2, 4, 7, 5, 6),
-        new Squad("Огры", 9, 40, 6, 12, 13, 7, 4)
+        new Squad("Огры", 6, 40, 6, 12, 13, 7, 4)
       ))
     val result = new Process(castle, stronghold).battle()
     result match {

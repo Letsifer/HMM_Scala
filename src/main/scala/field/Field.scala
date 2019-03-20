@@ -1,4 +1,6 @@
-package main
+package field
+
+import main.SquadInArmy
 
 import scala.util.Random
 

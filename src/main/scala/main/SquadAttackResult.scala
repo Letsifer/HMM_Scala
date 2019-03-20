@@ -15,7 +15,7 @@ class DamageSpellResult(val wizard: Hero, val usedSpell: Spell, val goal: Squad,
   extends HeroSpellResult(wizard, usedSpell, goal) {
   override def toString: String = {
     val basicMessage = super.toString
-    val damageMessage = if (wereAllCreaturesInDefenderSquadKilled)
+    val damageMessage = if (killedCreatures > 0)
       (s"$goal получили ${resultDamage} урона, убито ${killedCreatures} $goal")
     else
       (s"$goal получили ${resultDamage} урона")

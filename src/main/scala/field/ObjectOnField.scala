@@ -1,4 +1,6 @@
-package main
+package field
+
+import main.SquadInArmy
 
 trait ObjectOnField {
   def nameOnField: String
@@ -17,9 +19,9 @@ class SquadOnField(val squadInArmy: SquadInArmy) extends ObjectOnField {
 
   def isNotAlive = !squadInArmy.isAlive
 
-  def isThisSquadOnField(other: SquadInArmy) = squadInArmy == this.squadInArmy
+  def isThisSquadOnField(other: SquadInArmy) = squadInArmy == other
 
-  def isOtherSquadOnField(other: SquadInArmy) = !isThisSquadOnField(squadInArmy)
+  def isOtherSquadOnField(other: SquadInArmy) = !isThisSquadOnField(other)
 
   def areSquadsFromTheSameArmy(other: SquadInArmy) = squadInArmy.areSquadsFromTheSameArmy(other)
 }

@@ -42,7 +42,7 @@ class Hero(val name: String, val attack: Int, val defense: Int) {
 
   def noSpellInRound = canUseSpell
 
-  def useSpell = canUseSpell = true
+  def useSpell = canUseSpell = false
 
   def updateSpellUsage = canUseSpell = true
 
