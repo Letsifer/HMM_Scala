@@ -32,6 +32,8 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
   private var currentCreaturesNumber = creaturesInSquadAtStart
   private var currentHealth = maxHealth
 
+  def getCurrentHealth = currentHealth
+
   def getAttack: Int = attack + spellsOnSquad.collect {
     case attackSpell: AttackSpell => attackSpell.changeAttackValue
     case _ => 0
