@@ -75,7 +75,7 @@ class Field {
       }
     }
     findAllEnemySquadsFromPoint(attacker, findSquadOnField(attacker), null, 0, passedFields)
-      .sortWith(_.defender.totalHealth() < _.defender.totalHealth())
+      .sortWith(_.defender.totalHealth < _.defender.totalHealth)
   }
 
   /**

@@ -21,7 +21,9 @@ class SquadInArmy(val squad: Squad, val army: Army) {
 
   override def toString: String = squad.toString
 
-  def totalHealth() = squad.totalHealth()
+  def totalHealth = squad.totalHealth()
+
+  def hasNoMaxHealth = squad.hasNoMaxHealth
 }
 
 class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxHealth: Int, private val minAttack: Int, private val maxAttack: Int,
@@ -31,6 +33,8 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
 
   private var currentCreaturesNumber = creaturesInSquadAtStart
   private var currentHealth = maxHealth
+
+  def hasNoMaxHealth = currentHealth != maxHealth
 
   def getCurrentHealth = currentHealth
 
@@ -54,10 +58,10 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
         val result = receiveDamage(straightDamageSpell.damage)
         new DamageSpellResult(wizard, spell, this, result.resultDamage, result.wereAllCreaturesInDefenderSquadKilled, result.killedCreatures)
       }
-      case healingSpell: HealingSpell => {
-        if (maxHealth - currentHealth >= healingSpell.healing) {
-          currentHealth += healingSpell.healing
-          new HealingSpellResult(wizard, spell, this, healingSpell.healing)
+      case HealingSpell => {
+        if (maxHealth - currentHealth >= HealingSpell.healing) {
+          currentHealth += HealingSpell.healing
+          new HealingSpellResult(wizard, spell, this, HealingSpell.healing)
         } else {
           val healed = maxHealth - currentHealth
           currentHealth = maxHealth

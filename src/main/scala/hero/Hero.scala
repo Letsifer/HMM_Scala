@@ -1,6 +1,6 @@
 package hero
 
-import main.Army
+import main.{Army, Squad}
 
 import scala.util.Random
 
@@ -11,43 +11,68 @@ class HeroInArmy(val hero: Hero, val army: Army) {
   def useSpellOnSquad(enemyArmy: Army) = {
     if (hero.noSpellInRound) {
       val chosenSpell = hero.chooseSpell
-      val randomAllySquad = army.getRandomAliveSquad
-      if (chosenSpell.canBeActedOnSquad(randomAllySquad, this)) {
-        println(randomAllySquad.receiveSpell(chosenSpell.squadSpellByHeroSpell(randomAllySquad.squad), hero))
-        hero.useSpell
-      } else {
-        val randomEnemySquad = enemyArmy.getRandomAliveSquad
-        if (chosenSpell.canBeActedOnSquad(randomEnemySquad, this)) {
-          println(randomEnemySquad.receiveSpell(chosenSpell.squadSpellByHeroSpell(randomEnemySquad.squad), hero))
-          hero.useSpell
+      if (chosenSpell.nonEmpty) {
+        val randomAllySquad = army.getRandomAliveSquad
+        if (chosenSpell.get.canBeActedOnSquad(randomAllySquad, this)) {
+          println(hero.useSpell(chosenSpell.get, randomAllySquad.squad))
+        } else {
+          val randomEnemySquad = enemyArmy.getRandomAliveSquad
+          if (chosenSpell.get.canBeActedOnSquad(randomEnemySquad, this)) {
+            println(hero.useSpell(chosenSpell.get, randomEnemySquad.squad))
+          }
         }
       }
     }
   }
+
+  def getFullInfo = hero.getFullInfo
 }
 
 class HeroSpellBook {
-  private val heroSpells = List(StoneSkinHeroSpell, DestructionHeroSpell, WeaknessHeroSpell, BloodLustHeroSpell, MagicMissileHeroSpell, HealingHeroSpell)
+  private val heroSpells = List(StoneSkinSkill, DestructionSpell, WeaknessSpell, BloodLustSpell, MagicMissileSpell, HealingSpell)
 
-  def chooseSpell: HeroSpell = {
+  def chooseSpell(heroMana: Int): Option[Spell] = {
     val rand = new Random()
-    heroSpells(rand.nextInt(heroSpells.size))
+    val spellsWithManacostLessThenCurrentMana = heroSpells.filter(_.manacost <= heroMana)
+    if (spellsWithManacostLessThenCurrentMana.nonEmpty) {
+      Option(spellsWithManacostLessThenCurrentMana(rand.nextInt(spellsWithManacostLessThenCurrentMana.size)))
+    } else {
+      Option.empty
+    }
   }
 }
 
-class Hero(val name: String, val attack: Int, val defense: Int) {
+/**
+  * Создания героя по имени с базовыми характеристиками.
+  *
+  * @param name
+  * @param attack
+  * @param defense
+  * @param sorcery   Сила магии
+  * @param knowledge Колдовство
+  */
+class Hero(val name: String, val attack: Int, val defense: Int, val sorcery: Int, val knowledge: Int) {
 
   private val spellBook = new HeroSpellBook
   private var canUseSpell = true
 
+  private val maxMana = 10 * (knowledge + 1)
+  private var mana = maxMana
+
   def noSpellInRound = canUseSpell
 
-  def useSpell = canUseSpell = false
+  def useSpell(spell: Spell, squad: Squad) = {
+    canUseSpell = false
+    mana -= spell.manacost
+    squad.receiveSpell(spell, this)
+  }
 
   def updateSpellUsage = canUseSpell = true
 
-  def chooseSpell = spellBook.chooseSpell
+  def chooseSpell = spellBook.chooseSpell(mana)
 
   override def toString: String = name
+
+  def getFullInfo = s"$name: Мана: $mana ($maxMana)"
 
 }

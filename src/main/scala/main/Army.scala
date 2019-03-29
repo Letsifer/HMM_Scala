@@ -26,6 +26,7 @@ class Army(val name: String, private val hero: Hero, private val squads : List[S
 
   def getFullInfo: String = {
     val squadBuilder = StringBuilder.newBuilder
+    squadBuilder.append(heroInArmy.getFullInfo).append("\n")
     squads.filter(_.isAlive).map(_.getFullInfo).foreach(squadBuilder.append(_).append("\n"))
     squadBuilder.toString
   }

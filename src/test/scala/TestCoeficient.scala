@@ -5,11 +5,11 @@ import org.scalatest.{FlatSpec, PrivateMethodTester}
 class TestCoeficient extends FlatSpec with PrivateMethodTester {
 
   private def routineTesting(attackerHeroAttack: Int, attackerSquadAttack: Int, defenderHeroDefense: Int, defenderSquadDefense: Int, expectedResult: Double) = {
-    val attackerHero = new Hero("attacker_hero", attackerHeroAttack, 0)
+    val attackerHero = new Hero("attacker_hero", attackerHeroAttack, 0, 0, 0)
     val attacker = new Squad("attacker", 0, 0, 0, 0, attackerSquadAttack, 0, 0)
     val attackerArmy = new Army("attacker_army", attackerHero, List(attacker))
 
-    val defenderHero = new Hero("defender_hero", 0, defenderHeroDefense)
+    val defenderHero = new Hero("defender_hero", 0, defenderHeroDefense, 0, 0)
     val defender = new Squad("defender", 0, 0, 0, 0, 0, defenderSquadDefense, 0)
     val defenderArmy = new Army("defender_army", defenderHero, List(defender))
 
