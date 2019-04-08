@@ -55,13 +55,14 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
         new HeroSpellResult(wizard, spell, this)
       }
       case straightDamageSpell: StraightDamageSpell => {
-        val result = receiveDamage(straightDamageSpell.damage)
+        val result = receiveDamage(straightDamageSpell.damage(wizard))
         new DamageSpellResult(wizard, spell, this, result.resultDamage, result.wereAllCreaturesInDefenderSquadKilled, result.killedCreatures)
       }
       case HealingSpell => {
-        if (maxHealth - currentHealth >= HealingSpell.healing) {
-          currentHealth += HealingSpell.healing
-          new HealingSpellResult(wizard, spell, this, HealingSpell.healing)
+        val healingSpellResult = HealingSpell.healing(wizard)
+        if (maxHealth - currentHealth >= healingSpellResult) {
+          currentHealth += healingSpellResult
+          new HealingSpellResult(wizard, spell, this, healingSpellResult)
         } else {
           val healed = maxHealth - currentHealth
           currentHealth = maxHealth
@@ -89,7 +90,6 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
   def getLostCreaturesNumberWhileBattle = creaturesInSquadAtStart - currentCreaturesNumber
 
   def isAlive = currentCreaturesNumber > 0
-
 
   override def toString: String = name
 
