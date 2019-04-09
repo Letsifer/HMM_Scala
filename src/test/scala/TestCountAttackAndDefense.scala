@@ -1,29 +1,30 @@
 import hero._
-import main.{Squad, SquadInArmy}
+import hero.spell.{AttackSpell, ContinuousSpell, DefenseSpell, Spell}
+import main.Squad
 import org.scalatest.{FlatSpec, PrivateMethodTester}
 
 class TestCountAttackAndDefense extends FlatSpec with PrivateMethodTester {
 
   private val hero = new Hero("Test", 0, 0, 0, 0)
 
-  class TestAttackBuff(private val goal : Squad, private val bonusAttack : Int) extends ContinuousSpell("Test attack buff", 3, 3) with AttackSpell {
+  class TestAttackBuff(private val goal : Squad, private val bonusAttack : Int) extends ContinuousSpell(3) with AttackSpell {
     override def changeAttackValue: Int = bonusAttack
-    override def canBeActedOnSquad(goal: SquadInArmy, hero: HeroInArmy) = true
+    override def getTitle: String = "Test attack buff"
   }
 
-  class TestAttackDebuff(private val goal : Squad, private val minusAttack : Int) extends ContinuousSpell("Test attack debuff", 3, 3) with AttackSpell {
+  class TestAttackDebuff(private val goal : Squad, private val minusAttack : Int) extends ContinuousSpell(3) with AttackSpell {
     override def changeAttackValue: Int = -minusAttack
-    override def canBeActedOnSquad(goal: SquadInArmy, hero: HeroInArmy) = true
+    override def getTitle: String = "Test attack debuff"
   }
 
-  class TestDefenseBuff(private val goal : Squad, private val bonusDefense : Int) extends ContinuousSpell("Test defense buff", 3, 3) with DefenseSpell {
+  class TestDefenseBuff(private val goal : Squad, private val bonusDefense : Int) extends ContinuousSpell(3) with DefenseSpell {
     override def changeDefenseValue: Int = bonusDefense
-    override def canBeActedOnSquad(goal: SquadInArmy, hero: HeroInArmy) = true
+    override def getTitle: String = "Test defense buff"
   }
 
-  class TestDefenseDebuff(private val goal : Squad, private val minusDefense : Int) extends ContinuousSpell("Test defense debuff", 3, 3) with DefenseSpell {
+  class TestDefenseDebuff(private val goal : Squad, private val minusDefense : Int) extends ContinuousSpell(3) with DefenseSpell {
     override def changeDefenseValue: Int = -minusDefense
-    override def canBeActedOnSquad(goal: SquadInArmy, hero: HeroInArmy) = true
+    override def getTitle: String = "Test defense debuff"
   }
 
   private def createSquad(attack: Int, defense: Int) =

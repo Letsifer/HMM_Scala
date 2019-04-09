@@ -1,6 +1,7 @@
 package main
 
-import hero.{Hero, Spell}
+import hero.Hero
+import hero.spell._
 
 class SquadAttackResult(val resultDamage: Int, val wereAllCreaturesInDefenderSquadKilled: Boolean, val killedCreatures: Int) {
   def areCreaturesKilled() = killedCreatures > 0

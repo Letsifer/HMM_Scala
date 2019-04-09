@@ -30,4 +30,9 @@ class Army(val name: String, private val hero: Hero, private val squads : List[S
     squads.filter(_.isAlive).map(_.getFullInfo).foreach(squadBuilder.append(_).append("\n"))
     squadBuilder.toString
   }
+
+  def updateArmy = {
+    hero.updateSpellUsage
+    squads.foreach(squad => squad.updateSquad)
+  }
 }

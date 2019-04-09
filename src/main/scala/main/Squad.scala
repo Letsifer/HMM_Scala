@@ -1,6 +1,7 @@
 package main
 
-import hero._
+import hero.Hero
+import hero.spell._
 
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
@@ -55,14 +56,13 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
         new HeroSpellResult(wizard, spell, this)
       }
       case straightDamageSpell: StraightDamageSpell => {
-        val result = receiveDamage(straightDamageSpell.damage(wizard))
+        val result = receiveDamage(straightDamageSpell.damage)
         new DamageSpellResult(wizard, spell, this, result.resultDamage, result.wereAllCreaturesInDefenderSquadKilled, result.killedCreatures)
       }
-      case HealingSpell => {
-        val healingSpellResult = HealingSpell.healing(wizard)
-        if (maxHealth - currentHealth >= healingSpellResult) {
-          currentHealth += healingSpellResult
-          new HealingSpellResult(wizard, spell, this, healingSpellResult)
+      case healingSpell: HealingSpell => {
+        if (maxHealth - currentHealth >= healingSpell.healing) {
+          currentHealth += healingSpell.healing
+          new HealingSpellResult(wizard, spell, this, healingSpell.healing)
         } else {
           val healed = maxHealth - currentHealth
           currentHealth = maxHealth
@@ -70,6 +70,12 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
         }
       }
     }
+  }
+
+  def updateSquad = {
+    spellsOnSquad
+      .filter(spell => spell.decreaseRounds)
+      .foreach(spell => removeSpell(spell))
   }
 
   def removeSpell(spell: ContinuousSpell): Unit = {

@@ -1,4 +1,4 @@
-package hero.newspell
+package hero.spell
 
 class StoneSkinSpell(private val rounds : Int) extends ContinuousSpell(rounds) with DefenseSpell {
   /**
@@ -70,4 +70,30 @@ class WeaknessSpell (private val rounds : Int) extends ContinuousSpell(rounds) w
     * @return
     */
   override def getTitle: String = "Слабость"
+}
+
+class MagicMissileSpell(private val resultDamage : Int) extends StraightDamageSpell {
+  override def damage: Int = resultDamage
+
+  /**
+    * Наименование заклинания.
+    *
+    * TODO потом заменить на название параметра, по которому будет лежать ниаименование.
+    *
+    * @return
+    */
+  override def getTitle: String = "Волшебная стрела"
+}
+
+class HealingSpell(private val resultHealing : Int) extends Spell {
+  def healing : Int = resultHealing
+
+  /**
+    * Наименование заклинания.
+    *
+    * TODO потом заменить на название параметра, по которому будет лежать ниаименование.
+    *
+    * @return
+    */
+  override def getTitle: String = "Лечение"
 }

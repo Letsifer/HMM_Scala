@@ -1,12 +1,11 @@
 package hero
 
+import hero.spell._
 import main.{Army, Squad}
 
 import scala.util.Random
 
 class HeroInArmy(val hero: Hero, val army: Army) {
-
-  def updateSpellUsage = hero.updateSpellUsage
 
   def useSpellOnSquad(enemyArmy: Army) = {
     if (hero.noSpellInRound) {
@@ -29,9 +28,9 @@ class HeroInArmy(val hero: Hero, val army: Army) {
 }
 
 class HeroSpellBook {
-  private val heroSpells = List(StoneSkinSkill, DestructionSpell, WeaknessSpell, BloodLustSpell, MagicMissileSpell, HealingSpell)
+  private val heroSpells = List[HeroSpell](new StoneSkinHeroSpell(), new DestructionHeroSpell(), new BloodLustHeroSpell(), new WeaknessHeroSpell(), new MagicMissileHeroSpell(), new HealingHeroSpell())
 
-  def chooseSpell(heroMana: Int): Option[Spell] = {
+  def chooseSpell(heroMana: Int): Option[HeroSpell] = {
     val rand = new Random()
     val spellsWithManacostLessThenCurrentMana = heroSpells.filter(_.manacost <= heroMana)
     if (spellsWithManacostLessThenCurrentMana.nonEmpty) {
@@ -61,10 +60,10 @@ class Hero(val name: String, val attack: Int, val defense: Int, val sorcery: Int
 
   def noSpellInRound = canUseSpell
 
-  def useSpell(spell: Spell, squad: Squad) = {
+  def useSpell(spell: HeroSpell, squad: Squad) = {
     canUseSpell = false
     mana -= spell.manacost
-    squad.receiveSpell(spell, this)
+    squad.receiveSpell(spell.use(this), this)
   }
 
   def updateSpellUsage = canUseSpell = true

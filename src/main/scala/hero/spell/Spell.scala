@@ -1,4 +1,4 @@
-package hero.newspell
+package hero.spell
 
 /**
   * Заклинание, действующее на отряд.
@@ -16,15 +16,20 @@ trait Spell {
   override def toString: String = getTitle
 }
 
+trait StraightDamageSpell extends Spell {
+  def damage : Int
+}
+
 /**
   * Заклинание, которое действует несколько ходов.
   */
 abstract class ContinuousSpell(private val rounds : Int) extends Spell {
   private var remainRounds = rounds
+  override def toString: String = super.toString + " (" + remainRounds + ")"
 
   /**
     * Уменьшение оставшегося количества раундов, на которое будет действовать это заклинание.
-    * @return
+    * @return Закончилось ли действий заклинания.
     */
   def decreaseRounds : Boolean = {
     remainRounds -= 1

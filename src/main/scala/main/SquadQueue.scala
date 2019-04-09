@@ -16,8 +16,8 @@ class SquadQueue(private val firstArmy: Army, private val secondArmy: Army) {
     queue ++= firstArmy.squadsInArmy.filter(_.isAlive)
     queue ++= secondArmy.squadsInArmy.filter(_.isAlive)
     queue = queue.sortWith(_.getSpeed > _.getSpeed)
-    firstArmy.heroInArmy.updateSpellUsage
-    secondArmy.heroInArmy.updateSpellUsage
+    firstArmy.updateArmy
+    secondArmy.updateArmy
   }
 
   /**
