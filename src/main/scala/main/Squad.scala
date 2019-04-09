@@ -104,7 +104,7 @@ class Squad(val name: String, val creaturesInSquadAtStart: Int, private val maxH
     squadBuilder.append(s"$name: HP=$currentHealth($maxHealth), количество=$currentCreaturesNumber (было $creaturesInSquadAtStart)\n")
     squadBuilder.append(s"Атака=$getAttack, защита=$getDefense, урон=($minAttack-$maxAttack), скорость=$speed\n")
     for (spell <- spellsOnSquad) {
-      squadBuilder.append(s"$spell\n")
+      squadBuilder.append(s"${spell.fullSpell}\n")
     }
     squadBuilder.toString
   }

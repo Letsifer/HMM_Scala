@@ -12,6 +12,7 @@ trait Spell {
     * @return
     */
   def getTitle: String
+  def fullSpell = getTitle
 
   override def toString: String = getTitle
 }
@@ -25,7 +26,7 @@ trait StraightDamageSpell extends Spell {
   */
 abstract class ContinuousSpell(private val rounds : Int) extends Spell {
   private var remainRounds = rounds
-  override def toString: String = super.toString + " (" + remainRounds + ")"
+  override def fullSpell: String = super.toString + " (" + remainRounds + ")"
 
   /**
     * Уменьшение оставшегося количества раундов, на которое будет действовать это заклинание.
